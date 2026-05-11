@@ -1,7 +1,3 @@
-# OS
-.DS_Store
-Thumbs.db
-
 # Logs
 *.log
 
@@ -15,7 +11,3 @@ node_modules/
 # Build output
 dist/
 build/
-
-# Python cache
-__pycache__/
-*.pyc
