@@ -69,7 +69,9 @@ _Avoid_: Username, account name
 - A **Teacher** can end any **Active Pairing**.
 - A **Student** can end only the **Active Pairing** they belong to.
 - Ending an **Active Pairing** creates a **Completed Chat** in server memory.
-- An **In-Memory Login** creates or updates a **Chat Participant** with a **Display Name** only for the current running server process.
+- An **In-Memory Login** creates or updates a **Chat Participant** only for the current running server process.
+- A **Teacher** can join a **Classroom Activity** without a **Display Name**.
+- A **Student** must provide a **Display Name** so the teacher can identify them.
 - Version 1 does not persist **Chat Participants**, **Pairings**, or chat data in a database.
 - A **Classroom Activity** can have a **Teacher Email** supplied when the activity is created or during the activity.
 - Ending a **Classroom Activity** sends one **Transcript Email** to the **Teacher Email**.

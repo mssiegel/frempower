@@ -62,7 +62,8 @@ _Avoid_: WebSocket, polling stream
 - The **Teacher Page** is served at `/teacher`.
 - The **Student Page** is served at `/student`.
 - The **Teacher Page** and **Student Page** are open experiences anyone can visit.
-- The **Teacher Page** and **Student Page** use a display-name-only login for version 1.
+- The **Teacher Page** can start an activity without a teacher display name.
+- The **Student Page** requires a **Display Name** so the teacher can identify each student.
 - The **Teacher Page** shows the **Student List** and lets a teacher manually pair exactly two students.
 - The **Teacher Page** shows students in an active pairing as unavailable for new pairings.
 - The **Teacher Page** lets a teacher end any active pairing.
@@ -83,4 +84,4 @@ _Avoid_: WebSocket, polling stream
 
 - "client" means the browser-facing **Client**, not a customer or external consumer.
 - "teacher" and "student" name open experiences, not access-controlled roles.
-- "login" means entering a **Display Name**, not proving identity.
+- "login" means joining the current in-memory activity, not proving identity.
