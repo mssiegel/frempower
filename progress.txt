@@ -20,6 +20,8 @@ Changed:
 - Added the Client Material UI theme using the approved primary, secondary, neutral, text, and background colors.
 - Wrapped the Client with Material UI `ThemeProvider` and `CssBaseline`.
 - Marked the Material UI theme PRD task as done.
+- Added Client route wiring for `/`, `/teacher`, and `/student` with React Router.
+- Marked the completed route PRD task as done.
 
 Verification:
 - Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
@@ -27,3 +29,4 @@ Verification:
 - Ran `npm run build -w client`; first attempt failed because the installed `@vitejs/plugin-react` no longer accepts the old `babel` option.
 - Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after switching to `reactCompilerPreset` with `@rolldown/plugin-babel`.
 - Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding the Material UI theme.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding the Client routes.

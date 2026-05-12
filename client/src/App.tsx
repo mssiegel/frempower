@@ -1,10 +1,21 @@
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css';
 
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <main />,
+  },
+  {
+    path: '/teacher',
+    element: <main />,
+  },
+  {
+    path: '/student',
+    element: <main />,
+  },
+]);
+
 export function App() {
-  return (
-    <main className="app-shell">
-      <h1>Frempower</h1>
-      <p>Client scaffold is running.</p>
-    </main>
-  );
+  return <RouterProvider router={router} />;
 }
