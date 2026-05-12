@@ -50,7 +50,7 @@ Text:
 
 ## Tasks
 
-- [ ] Create a root npm workspace with `client` and `server` packages.
+- [x] Create a root npm workspace with `client` and `server` packages.
 - [ ] Scaffold the Client as a Vite React TypeScript app.
 - [ ] Add Material UI, React Router, Socket.IO client, Inter font, and React Compiler config.
 - [ ] Add the Material UI theme using the approved palette.

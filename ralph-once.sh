@@ -28,9 +28,10 @@ Rules:
 7. Do not add a database.
 8. Do not add Docker, Docker Compose, dev containers, or container-specific scripts.
 9. Run the most relevant verification command for the task.
-10. Update progress.txt with what changed and what verification ran.
-11. Do not commit. Leave the diff for human review.
-12. Stay inside this repository. Do not read, write, or modify files outside the repo unless explicitly asked.
+10. Mark the completed task as done in PRD.md by changing its checkbox from `[ ]` to `[x]`.
+11. Update progress.txt with what changed and what verification ran.
+12. Do not commit. Leave the diff for human review.
+13. Stay inside this repository. Do not read, write, or modify files outside the repo unless explicitly asked.
 
 At the end, summarize:
 - task completed
