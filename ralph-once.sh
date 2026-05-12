@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-codex exec \
+codex -a on-request exec \
   -C "$PWD" \
-  -s workspace-write \
-  -a on-request \
+  -s danger-full-access \
   "$(cat <<'PROMPT'
 You are working on GitHub issue #2: Scaffold V1 App Shell.
 
@@ -31,6 +30,7 @@ Rules:
 9. Run the most relevant verification command for the task.
 10. Update progress.txt with what changed and what verification ran.
 11. Do not commit. Leave the diff for human review.
+12. Stay inside this repository. Do not read, write, or modify files outside the repo unless explicitly asked.
 
 At the end, summarize:
 - task completed
