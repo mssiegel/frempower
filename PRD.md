@@ -53,7 +53,7 @@ Text:
 - [x] Create a root npm workspace with `client` and `server` packages.
 - [x] Scaffold the Client as a Vite React TypeScript app.
 - [x] Add Material UI, React Router, Socket.IO client, Inter font, and React Compiler config.
-- [ ] Add the Material UI theme using the approved palette.
+- [x] Add the Material UI theme using the approved palette.
 - [ ] Add routes for `/`, `/teacher`, and `/student`.
 - [ ] Add visible placeholder pages for Homepage, Teacher Page, and Student Page.
 - [ ] Give the Homepage SEO-oriented metadata and semantic content structure.

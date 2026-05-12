@@ -17,9 +17,13 @@ Changed:
 - Configured Vite to run the React Compiler preset through the current `@vitejs/plugin-react` API.
 - Imported Inter font weights in the Client entrypoint and set Inter as the first CSS font family.
 - Marked the completed PRD task as done.
+- Added the Client Material UI theme using the approved primary, secondary, neutral, text, and background colors.
+- Wrapped the Client with Material UI `ThemeProvider` and `CssBaseline`.
+- Marked the Material UI theme PRD task as done.
 
 Verification:
 - Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
 - Ran `npm run build -w client`; TypeScript and Vite production build completed successfully.
 - Ran `npm run build -w client`; first attempt failed because the installed `@vitejs/plugin-react` no longer accepts the old `babel` option.
 - Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after switching to `reactCompilerPreset` with `@rolldown/plugin-babel`.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding the Material UI theme.
