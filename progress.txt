@@ -2,12 +2,24 @@ Issue #2 progress
 
 Completed:
 - Created the root npm workspace with `client` and `server` packages.
+- Scaffolded the Client as a Vite React TypeScript app.
+- Added Material UI, React Router, Socket.IO client, Inter font, and React Compiler config.
 
 Changed:
 - Added root `package.json` with npm workspaces for `client` and `server`.
 - Added minimal package metadata for `@frempower/client`.
 - Added minimal package metadata for `@frempower/server`.
 - Generated `package-lock.json` from npm workspace install.
+- Added React, React DOM, Vite, TypeScript, and Vite React plugin dependencies to `@frempower/client`.
+- Added client Vite, TypeScript, HTML, React entry, and minimal app shell files.
+- Added Client dependencies for Material UI, Emotion, React Router, Socket.IO client, and Inter font assets.
+- Added Client dev dependencies for React Compiler integration with Vite.
+- Configured Vite to run the React Compiler preset through the current `@vitejs/plugin-react` API.
+- Imported Inter font weights in the Client entrypoint and set Inter as the first CSS font family.
+- Marked the completed PRD task as done.
 
 Verification:
 - Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully.
+- Ran `npm run build -w client`; first attempt failed because the installed `@vitejs/plugin-react` no longer accepts the old `babel` option.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after switching to `reactCompilerPreset` with `@rolldown/plugin-babel`.
