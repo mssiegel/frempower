@@ -1,80 +1,62 @@
-# Issue #2: Scaffold V1 App Shell
+# Issue #3: Shared Realtime Contracts And Activity Foundation
 
-Goal: Create the runnable Frempower V1 baseline across the Client and Server.
+Goal: Create the shared realtime contracts and in-memory activity foundation for Frempower V1.
+
+## Parent
+
+Parent PRD: GitHub issue #1.
 
 ## Known decisions
 
 - Use a root npm workspace.
 - Client lives in `client/`.
 - Server lives in `server/`.
-- Client: Vite, React, TypeScript, Material UI, React Router, Socket.IO client, React Compiler, Inter typography.
-- Server: Node.js, Express, TypeScript, Socket.IO.
-- State: no database for V1.
-- No Docker for issue #2.
-- Routes:
-  - `/` Homepage
-  - `/teacher` Teacher Page
-  - `/student` Student Page
-- Homepage is the only search-indexable Client page.
-- Teacher Page and Student Page are open app experiences, not authenticated dashboards.
-- Follow ADR-0001 and the context docs.
+- Shared realtime contracts live in a workspace package named `@frempower/shared`.
+- Server validation remains authoritative.
+- Use plain runtime validation functions rather than adding a schema validation library.
+- State changes are sent through full audience-specific activity snapshots.
+- Realtime commands use Socket.IO acknowledgements with a standard success/error discriminated union.
+- Command acknowledgement errors include stable machine-readable error codes separate from user-facing copy.
+- Server activity rules live in an in-memory activity service or store separate from Socket.IO handlers.
+- Activity service tests should be deterministic through centralized or injectable clock, random, and Join Code dependencies.
+- Keep Ralph human-in-the-loop. `ralph-once.sh` runs one watched iteration and leaves diffs for software engineering author review.
 
-## Palette
+## Scope
 
-Primary:
+Create the foundation for shared contracts and server activity logic. This slice should introduce `@frempower/shared`, define the core realtime contract types/constants/helpers, add Vitest, create a server activity service skeleton that can be tested independently from Socket.IO, and preserve the realtime/session ADR.
 
-- `#070AC5`
-- `#5B5DF9`
-- `#9D9EFB`
-- `#C4C5FD`
-- `#EBECFE`
-- `#F8F8FF`
-
-Secondary:
-
-- `#95C021`
-- `#BFE35B`
-- `#DDF0A8`
-- `#F8FCEE`
-
-Neutrals:
-
-- `#2B313B`
-- `#4D586A`
-- `#718098`
-- `#A0AABA`
-- `#D0D5DD`
-- `#F3F4F6`
-- `#FFFFFF`
-
-Text:
-
-- primary `#2B313B`
-- secondary `#718098`
+This slice should not implement the full host, join, pairing, or chat UI flows yet.
 
 ## Tasks
 
-- [x] Create a root npm workspace with `client` and `server` packages.
-- [x] Scaffold the Client as a Vite React TypeScript app.
-- [x] Add Material UI, React Router, Socket.IO client, Inter font, and React Compiler config.
-- [x] Add the Material UI theme using the approved palette.
-- [x] Add routes for `/`, `/teacher`, and `/student`.
-- [x] Add visible placeholder pages for Homepage, Teacher Page, and Student Page.
-- [x] Give the Homepage SEO-oriented metadata and semantic content structure.
-- [x] Scaffold the Server with Node.js, Express, TypeScript, and Socket.IO.
-- [x] Add a health check endpoint.
-- [x] Add basic Socket.IO connection wiring. only teachers page and students page need socket connections (not the homepage)
-- [x] Configure Client local access to the Server and Socket.IO endpoint.
-- [x] Add root build, lint, test, and dev commands.
-- [x] Make build, lint, and test pass.
+- [ ] Add a workspace package named `@frempower/shared`.
+- [ ] Shared package exports product constants including Join Code length/range, default Character Names, chat message length, and disconnect timeout durations.
+- [ ] Shared package exports a standard command acknowledgement result type with success/error discriminated union.
+- [ ] Command acknowledgement errors support stable machine-readable error codes separate from user-facing copy.
+- [ ] Shared package exports initial teacher/student snapshot and realtime payload types.
+- [ ] Shared package exports pure normalization helpers for Character Names and Student Real Names.
+- [ ] Add Vitest for shared and server tests.
+- [ ] Create an in-memory activity service/store skeleton separate from Socket.IO handlers.
+- [ ] Activity service accepts or centralizes clock/random/join-code dependencies so tests can be deterministic.
+- [ ] Activity service does not import or directly use Socket.IO.
+- [ ] Add or preserve system ADR `docs/adr/0002-realtime-session-contracts.md`.
+- [ ] Tests cover shared constants/helpers, acknowledgement result helpers if present, Join Code generation collision retry, and basic activity service construction.
+- [ ] Confirm with software engineering author that its okay for Ralph to automatically push this branc to github merge it into git Main and then close the related Github issue.
 
 ## Constraints
 
-- Do not implement the full Classroom Activity workflow yet.
+- Do not implement the full host, join, pairing, or chat UI flows yet.
 - Do not add authentication.
 - Do not add a database.
 - Do not add Docker, Docker Compose, dev containers, or container-specific scripts.
-- Keep this baseline simple and boring.
-- Prefer known-working defaults over clever architecture.
-- Use local npm workspace scripts for development, build, lint, and test.
-- Use project terminology from `client/CONTEXT.md` and `server/CONTEXT.md`.
+- Keep Socket.IO handlers thin and outside the activity service.
+- Do not use socket IDs as participant identity.
+- Prefer small, reviewable commits.
+- Run the most relevant feedback loop before marking a task complete.
+- Leave Ralph iteration diffs uncommitted for software engineering author review.
+
+## Verification
+
+- Run focused tests or type checks for the task Ralph completes.
+- Before a Ralph task is marked complete, update this file and `progress.txt`.
+- Do not declare the issue complete until all checkboxes are checked and the software engineering author has approved any automated push, merge, and GitHub issue closure behavior.
