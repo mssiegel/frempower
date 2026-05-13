@@ -38,6 +38,8 @@ Changed:
 - Added basic Server Socket.IO connection and disconnect logging.
 - Added Client Realtime Connection wiring that is used only by the Teacher Page and Student Page placeholders.
 - Marked the completed Socket.IO connection wiring PRD task as done.
+- Configured the Client Vite dev server to proxy `/health` and `/socket.io` to the local Server on port 3001.
+- Marked the completed Client local Server and Socket.IO access PRD task as done.
 
 Verification:
 - Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
@@ -54,3 +56,4 @@ Verification:
 - Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding basic Realtime Connection wiring.
 - Ran `npm run build -w server`; TypeScript compilation completed successfully after adding Socket.IO connection logging.
 - Ran a temporary built Server on port 3103 and connected with `socket.io-client`; it logged a successful client connection id.
+- Ran temporary Server and Client dev servers, requested `GET /health` through the Client dev origin, and connected with `socket.io-client` through the Client dev origin; both succeeded.
