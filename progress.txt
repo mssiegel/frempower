@@ -1,0 +1,70 @@
+Issue #2 progress
+
+Completed:
+- Created the root npm workspace with `client` and `server` packages.
+- Scaffolded the Client as a Vite React TypeScript app.
+- Added Material UI, React Router, Socket.IO client, Inter font, and React Compiler config.
+
+Changed:
+- Added root `package.json` with npm workspaces for `client` and `server`.
+- Added minimal package metadata for `@frempower/client`.
+- Added minimal package metadata for `@frempower/server`.
+- Generated `package-lock.json` from npm workspace install.
+- Added React, React DOM, Vite, TypeScript, and Vite React plugin dependencies to `@frempower/client`.
+- Added client Vite, TypeScript, HTML, React entry, and minimal app shell files.
+- Added Client dependencies for Material UI, Emotion, React Router, Socket.IO client, and Inter font assets.
+- Added Client dev dependencies for React Compiler integration with Vite.
+- Configured Vite to run the React Compiler preset through the current `@vitejs/plugin-react` API.
+- Imported Inter font weights in the Client entrypoint and set Inter as the first CSS font family.
+- Marked the completed PRD task as done.
+- Added the Client Material UI theme using the approved primary, secondary, neutral, text, and background colors.
+- Wrapped the Client with Material UI `ThemeProvider` and `CssBaseline`.
+- Marked the Material UI theme PRD task as done.
+- Added Client route wiring for `/`, `/teacher`, and `/student` with React Router.
+- Marked the completed route PRD task as done.
+- Added visible placeholder pages for the Homepage, Teacher Page, and Student Page.
+- Marked the completed placeholder pages PRD task as done.
+- Added Homepage SEO-oriented HTML metadata.
+- Replaced the Homepage placeholder with semantic header, navigation, main, section, heading, and list structure.
+- Marked the completed Homepage SEO and semantic structure PRD task as done.
+- Added Server dependencies for Express and Socket.IO.
+- Added Server dev dependencies for TypeScript, tsx, and Node/Express types.
+- Added Server build, dev, and start package scripts.
+- Added Server TypeScript configuration.
+- Added a minimal Server entrypoint that starts an Express HTTP server with Socket.IO attached.
+- Marked the completed Server scaffold PRD task as done.
+- Added a `GET /health` endpoint that returns `{ "status": "ok" }`.
+- Marked the completed health check endpoint PRD task as done.
+- Added basic Server Socket.IO connection and disconnect logging.
+- Added Client Realtime Connection wiring that is used only by the Teacher Page and Student Page placeholders.
+- Marked the completed Socket.IO connection wiring PRD task as done.
+- Configured the Client Vite dev server to proxy `/health` and `/socket.io` to the local Server on port 3001.
+- Marked the completed Client local Server and Socket.IO access PRD task as done.
+- Added root npm workspace scripts for `dev`, `build`, `lint`, and `test`.
+- Added `concurrently` as a root dev dependency so `npm run dev` can start the Client and Server together.
+- Marked the completed root command PRD task as done.
+- Added Client and Server workspace `lint` scripts that run TypeScript checks.
+- Added Client and Server workspace `test` scripts that run TypeScript checks for the scaffold baseline.
+- Marked the completed build, lint, and test PRD task as done.
+
+Verification:
+- Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully.
+- Ran `npm run build -w client`; first attempt failed because the installed `@vitejs/plugin-react` no longer accepts the old `babel` option.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after switching to `reactCompilerPreset` with `@rolldown/plugin-babel`.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding the Material UI theme.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding the Client routes.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding visible placeholder pages.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding Homepage metadata and semantic content.
+- Ran `npm run build -w server`; TypeScript compilation completed successfully after scaffolding the Server.
+- Ran `npm run build -w server`; TypeScript compilation completed successfully after adding the health check endpoint.
+- Ran a temporary built Server on port 3102 and requested `GET /health`; it returned `{"status":"ok"}`.
+- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding basic Realtime Connection wiring.
+- Ran `npm run build -w server`; TypeScript compilation completed successfully after adding Socket.IO connection logging.
+- Ran a temporary built Server on port 3103 and connected with `socket.io-client`; it logged a successful client connection id.
+- Ran temporary Server and Client dev servers, requested `GET /health` through the Client dev origin, and connected with `socket.io-client` through the Client dev origin; both succeeded.
+- Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
+- Ran `npm run build`; the root workspace build completed successfully for both Client and Server.
+- Ran `npm run build`; the root workspace build completed successfully for both Client and Server.
+- Ran `npm run lint`; the root workspace lint command completed successfully for both Client and Server.
+- Ran `npm run test`; the root workspace test command completed successfully for both Client and Server.
