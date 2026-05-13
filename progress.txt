@@ -43,6 +43,9 @@ Changed:
 - Added root npm workspace scripts for `dev`, `build`, `lint`, and `test`.
 - Added `concurrently` as a root dev dependency so `npm run dev` can start the Client and Server together.
 - Marked the completed root command PRD task as done.
+- Added Client and Server workspace `lint` scripts that run TypeScript checks.
+- Added Client and Server workspace `test` scripts that run TypeScript checks for the scaffold baseline.
+- Marked the completed build, lint, and test PRD task as done.
 
 Verification:
 - Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
@@ -62,3 +65,6 @@ Verification:
 - Ran temporary Server and Client dev servers, requested `GET /health` through the Client dev origin, and connected with `socket.io-client` through the Client dev origin; both succeeded.
 - Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
 - Ran `npm run build`; the root workspace build completed successfully for both Client and Server.
+- Ran `npm run build`; the root workspace build completed successfully for both Client and Server.
+- Ran `npm run lint`; the root workspace lint command completed successfully for both Client and Server.
+- Ran `npm run test`; the root workspace test command completed successfully for both Client and Server.

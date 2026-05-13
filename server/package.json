@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
+    "lint": "tsc --noEmit",
+    "test": "tsc --noEmit",
     "start": "node dist/index.js"
   },
   "dependencies": {
