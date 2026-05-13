@@ -1,6 +1,80 @@
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Link as RouterLink, RouterProvider } from 'react-router-dom';
 import './index.css';
+
+function Homepage() {
+  return (
+    <Box className="homepage">
+      <Box component="header" className="homepage-header">
+        <Container maxWidth="lg">
+          <Box component="nav" aria-label="Primary navigation" className="homepage-nav">
+            <Typography component="a" href="/" className="homepage-brand">
+              Frempower
+            </Typography>
+            <Stack component="ul" direction="row" spacing={1.5} className="homepage-nav-list">
+              <li>
+                <Button component={RouterLink} to="/teacher" variant="contained">
+                  Teacher Page
+                </Button>
+              </li>
+              <li>
+                <Button component={RouterLink} to="/student" variant="outlined">
+                  Student Page
+                </Button>
+              </li>
+            </Stack>
+          </Box>
+        </Container>
+      </Box>
+
+      <Box component="main">
+        <Box component="section" className="homepage-hero" aria-labelledby="homepage-title">
+          <Container maxWidth="lg">
+            <Stack spacing={3} className="homepage-hero-content">
+              <Typography component="p" className="homepage-kicker">
+                Live classroom pair chats
+              </Typography>
+              <Typography component="h1" id="homepage-title" className="homepage-title">
+                Frempower helps teachers run focused student chats.
+              </Typography>
+              <Typography className="homepage-summary">
+                Start an open classroom activity, pair students for real-time conversations,
+                and keep completed chats visible for teacher review during the session.
+              </Typography>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} className="homepage-actions">
+                <Button component={RouterLink} to="/teacher" size="large" variant="contained">
+                  Open Teacher Page
+                </Button>
+                <Button component={RouterLink} to="/student" size="large" variant="outlined">
+                  Open Student Page
+                </Button>
+              </Stack>
+            </Stack>
+          </Container>
+        </Box>
+
+        <Box component="section" className="homepage-section" aria-labelledby="classroom-activity-title">
+          <Container maxWidth="lg">
+            <Stack spacing={2.5} className="homepage-section-content">
+              <Typography component="h2" id="classroom-activity-title" className="homepage-section-title">
+                Built for a live classroom activity
+              </Typography>
+              <Typography className="homepage-section-copy">
+                The Client keeps the Homepage public and search-indexable while the App Shell
+                gives teachers and students direct access to their open experiences.
+              </Typography>
+              <Box component="ul" className="homepage-feature-list">
+                <li>Teachers can prepare to manage a student list and pair exactly two students.</li>
+                <li>Students can prepare to join with a display name and chat when paired.</li>
+                <li>Completed chats stay in memory for the current running server process.</li>
+              </Box>
+            </Stack>
+          </Container>
+        </Box>
+      </Box>
+    </Box>
+  );
+}
 
 function PagePlaceholder({
   eyebrow,
@@ -65,13 +139,7 @@ function PagePlaceholder({
 const router = createBrowserRouter([
   {
     path: '/',
-    element: (
-      <PagePlaceholder
-        description="Frempower helps teachers run live student pair chats from an open classroom activity."
-        eyebrow="Frempower"
-        title="Homepage"
-      />
-    ),
+    element: <Homepage />,
   },
   {
     path: '/teacher',

@@ -20,6 +20,111 @@ body {
   min-height: 100vh;
 }
 
+.homepage {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, #f8f8ff 0%, #ffffff 42%),
+    #ffffff;
+}
+
+.homepage-header {
+  border-bottom: 1px solid #d0d5dd;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.homepage-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: 4.75rem;
+}
+
+.homepage-brand {
+  color: #070ac5;
+  font-size: 1.125rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.homepage-nav-list {
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.homepage-hero {
+  padding: 5rem 0 4rem;
+}
+
+.homepage-hero-content {
+  max-width: 48rem;
+}
+
+.homepage-kicker {
+  margin: 0;
+  color: #95c021;
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.homepage-title {
+  margin: 0;
+  color: #2b313b;
+  font-size: 5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.homepage-summary {
+  max-width: 44rem;
+  margin: 0;
+  color: #4d586a;
+  font-size: 1.25rem;
+  line-height: 1.6;
+}
+
+.homepage-actions {
+  padding-top: 0.75rem;
+}
+
+.homepage-section {
+  padding: 3rem 0 4rem;
+  background: #ffffff;
+}
+
+.homepage-section-content {
+  max-width: 50rem;
+}
+
+.homepage-section-title {
+  margin: 0;
+  color: #2b313b;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.homepage-section-copy {
+  margin: 0;
+  color: #4d586a;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+
+.homepage-feature-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #2b313b;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
 .app-shell {
   display: grid;
   min-height: 100vh;
@@ -36,4 +141,33 @@ body {
 .app-shell p {
   margin: 0.75rem 0 0;
   color: #718098;
+}
+
+@media (max-width: 600px) {
+  .homepage-nav {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 1rem 0;
+  }
+
+  .homepage-nav-list {
+    width: 100%;
+  }
+
+  .homepage-nav-list li {
+    flex: 1;
+  }
+
+  .homepage-nav-list a,
+  .homepage-nav-list button {
+    width: 100%;
+  }
+
+  .homepage-hero {
+    padding: 3.5rem 0 3rem;
+  }
+
+  .homepage-title {
+    font-size: 2.75rem;
+  }
 }
