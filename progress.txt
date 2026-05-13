@@ -5,19 +5,16 @@ Current mode:
 - This iteration implemented exactly one unchecked PRD task and left the diff uncommitted for software engineering author review.
 
 Completed:
-- Shared package exports product constants including Join Code length/range, default Character Names, chat message length, and disconnect timeout durations.
+- Shared package exports a standard command acknowledgement result type with success/error discriminated union.
 
 Changed:
-- Added shared Join Code constants for the five-digit length and `10000` through `99999` range.
-- Added the default Character Names used by the teacher host flow.
-- Added the version 1 chat message length limit.
-- Added shared disconnect timeout durations for teacher disconnect, lobby student disconnect, disconnected pairing, and chat reconnect behavior.
+- Added `CommandAcknowledgementSuccess`, `CommandAcknowledgementError`, and `CommandAcknowledgementResult` exports to `@frempower/shared`.
+- Added small `commandAcknowledgementSuccess` and `commandAcknowledgementError` helpers so client and server code can construct the standard acknowledgement shape consistently.
 - Marked the matching PRD task complete.
 
 Key decisions:
-- Kept this slice to constants only; acknowledgement result types, error codes, snapshot types, normalization helpers, Vitest setup, and activity service work remain separate unchecked tasks.
-- Exported constants directly from the shared package entry point so client and server code can consume one source of truth in later iterations.
-- Kept the default Character Names readonly with literal types.
+- Used an `ok: true` / `ok: false` discriminant because Socket.IO command acknowledgements need a compact success/error result shape.
+- Kept the error payload generic in this slice so the stable machine-readable error code contract remains a separate unchecked task.
 - Did not add Vitest, Socket.IO wiring, authentication, database, Docker, or product flows.
 
 Blockers:
@@ -32,4 +29,4 @@ Verification:
 - Passed: `npm run build -w @frempower/shared`
 
 Notes for next iteration:
-- A good next task is to add the standard command acknowledgement result type and stable command error code contract.
+- A good next task is to define stable command acknowledgement error codes separate from user-facing copy.
