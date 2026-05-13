@@ -2,31 +2,38 @@ Issue #3 progress
 
 Current mode:
 - Ralph remains human-in-the-loop.
-- `ralph-once.sh` should run one watched iteration, implement exactly one unchecked PRD task, and leave the diff uncommitted for software engineering author review.
+- This iteration implemented exactly one unchecked PRD task and left the diff uncommitted for software engineering author review.
 
 Completed:
-- Prepared `PRD.md` for GitHub issue #3: Shared Realtime Contracts And Activity Foundation.
-- Added issue #3 acceptance criteria as unchecked PRD tasks.
-- Added the final software engineering author confirmation task for automated push, merge into git Main, and GitHub issue closure.
-- Reset `progress.txt` for issue #3.
-- Updated `ralph-once.sh` to point Ralph at issue #3 and the shared realtime/activity foundation scope.
+- Added a workspace package named `@frempower/shared`.
 
 Changed:
-- Replaced the issue #2 PRD with issue #3 scope, decisions, tasks, constraints, and verification notes.
-- Replaced issue #2 progress notes with issue #3 kickoff progress notes.
-- Updated Ralph's HITL prompt to:
-  - Read the relevant repo context and ADR files.
-  - Pick exactly one unchecked task from `PRD.md`.
-  - Keep changes small and focused.
-  - Run relevant feedback loops.
-  - Update `PRD.md` and `progress.txt`.
-  - Leave the diff uncommitted for human review.
-  - Avoid future issue behavior and unrelated product flows.
+- Registered `shared` in the root npm workspace.
+- Added `shared/package.json` for the private `@frempower/shared` ESM package.
+- Added `shared/tsconfig.json` for strict TypeScript builds with declaration output.
+- Added a minimal `shared/src/index.ts` export surface so the package can build now and receive contracts/constants/helpers in later iterations.
+- Updated `package-lock.json` with the new workspace link.
+- Marked the matching PRD task complete.
+
+Key decisions:
+- Kept this slice to package scaffolding only; product constants, acknowledgement types, snapshots, and normalization helpers remain separate unchecked tasks.
+- Used the existing workspace build pattern and TypeScript dependency version.
+- Did not add Vitest, Socket.IO wiring, authentication, database, Docker, or product flows.
+
+Blockers:
+- None.
+
+Files changed:
+- `package.json`
+- `package-lock.json`
+- `shared/package.json`
+- `shared/tsconfig.json`
+- `shared/src/index.ts`
+- `PRD.md`
+- `progress.txt`
 
 Verification:
-- Pending: commit prep changes, create and switch to the issue #3 branch, and run `chmod +x ralph-once.sh`.
+- Passed: `npm run build -w @frempower/shared`
 
 Notes for next iteration:
-- Start with the riskiest or most foundational unchecked task from `PRD.md`.
-- Likely good first task: add the `@frempower/shared` workspace package and minimal exports so later tasks have a stable home.
-- Preserve `docs/adr/0002-realtime-session-contracts.md`; update only if implementation discoveries require it.
+- A good next task is to add shared product constants for Join Code length/range, default Character Names, chat message length, and disconnect timeout durations.

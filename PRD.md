@@ -29,7 +29,7 @@ This slice should not implement the full host, join, pairing, or chat UI flows y
 
 ## Tasks
 
-- [ ] Add a workspace package named `@frempower/shared`.
+- [x] Add a workspace package named `@frempower/shared`.
 - [ ] Shared package exports product constants including Join Code length/range, default Character Names, chat message length, and disconnect timeout durations.
 - [ ] Shared package exports a standard command acknowledgement result type with success/error discriminated union.
 - [ ] Command acknowledgement errors support stable machine-readable error codes separate from user-facing copy.
