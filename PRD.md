@@ -22,6 +22,7 @@ Goal: Create the runnable Frempower V1 baseline across the Client and Server.
 ## Palette
 
 Primary:
+
 - `#070AC5`
 - `#5B5DF9`
 - `#9D9EFB`
@@ -30,12 +31,14 @@ Primary:
 - `#F8F8FF`
 
 Secondary:
+
 - `#95C021`
 - `#BFE35B`
 - `#DDF0A8`
 - `#F8FCEE`
 
 Neutrals:
+
 - `#2B313B`
 - `#4D586A`
 - `#718098`
@@ -45,6 +48,7 @@ Neutrals:
 - `#FFFFFF`
 
 Text:
+
 - primary `#2B313B`
 - secondary `#718098`
 

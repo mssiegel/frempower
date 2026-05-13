@@ -6,6 +6,7 @@
     "dev": "concurrently -n server,client \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run build --workspaces",
     "lint": "npm run lint --workspaces --if-present",
+    "lint-staged": "lint-staged",
     "test": "npm run test --workspaces --if-present",
     "prepare": "husky"
   },

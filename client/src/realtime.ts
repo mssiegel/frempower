@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 export function useRealtimeConnection() {
   const [isConnected, setIsConnected] = useState(false);
@@ -7,11 +7,11 @@ export function useRealtimeConnection() {
   useEffect(() => {
     const socket = io({ autoConnect: false });
 
-    socket.on('connect', () => {
+    socket.on("connect", () => {
       setIsConnected(true);
     });
 
-    socket.on('disconnect', () => {
+    socket.on("disconnect", () => {
       setIsConnected(false);
     });
 

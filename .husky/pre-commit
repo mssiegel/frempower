@@ -1,2 +1,10 @@
-npx lint-staged
-npm run test
+run_npm() {
+  if command -v cmd.exe >/dev/null 2>&1; then
+    cmd.exe /d /s /c "npm $*"
+  else
+    npm "$@"
+  fi
+}
+
+run_npm run lint-staged --
+run_npm run test

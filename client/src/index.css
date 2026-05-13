@@ -22,9 +22,7 @@ body {
 
 .homepage {
   min-height: 100vh;
-  background:
-    linear-gradient(180deg, #f8f8ff 0%, #ffffff 42%),
-    #ffffff;
+  background: linear-gradient(180deg, #f8f8ff 0%, #ffffff 42%), #ffffff;
 }
 
 .homepage-header {
