@@ -61,7 +61,7 @@ Text:
 - [x] Add a health check endpoint.
 - [x] Add basic Socket.IO connection wiring. only teachers page and students page need socket connections (not the homepage)
 - [x] Configure Client local access to the Server and Socket.IO endpoint.
-- [ ] Add root build, lint, test, and dev commands.
+- [x] Add root build, lint, test, and dev commands.
 - [ ] Make build, lint, and test pass.
 
 ## Constraints
