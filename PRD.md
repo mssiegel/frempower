@@ -32,7 +32,7 @@ This slice should not implement the full host, join, pairing, or chat UI flows y
 - [x] Add a workspace package named `@frempower/shared`.
 - [x] Shared package exports product constants including Join Code length/range, default Character Names, chat message length, and disconnect timeout durations.
 - [x] Shared package exports a standard command acknowledgement result type with success/error discriminated union.
-- [ ] Command acknowledgement errors support stable machine-readable error codes separate from user-facing copy.
+- [x] Command acknowledgement errors support stable machine-readable error codes separate from user-facing copy.
 - [ ] Shared package exports initial teacher/student snapshot and realtime payload types.
 - [ ] Shared package exports pure normalization helpers for Character Names and Student Real Names.
 - [ ] Add Vitest for shared and server tests.

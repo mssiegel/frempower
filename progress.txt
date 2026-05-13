@@ -5,16 +5,18 @@ Current mode:
 - This iteration implemented exactly one unchecked PRD task and left the diff uncommitted for software engineering author review.
 
 Completed:
-- Shared package exports a standard command acknowledgement result type with success/error discriminated union.
+- Command acknowledgement errors support stable machine-readable error codes separate from user-facing copy.
 
 Changed:
-- Added `CommandAcknowledgementSuccess`, `CommandAcknowledgementError`, and `CommandAcknowledgementResult` exports to `@frempower/shared`.
-- Added small `commandAcknowledgementSuccess` and `commandAcknowledgementError` helpers so client and server code can construct the standard acknowledgement shape consistently.
+- Added `COMMAND_ACKNOWLEDGEMENT_ERROR_CODES` and `CommandAcknowledgementErrorCode` exports to `@frempower/shared`.
+- Added `CommandAcknowledgementErrorPayload` so acknowledgement errors carry a stable machine-readable `code`, separate user-facing `message`, and optional command-specific `details`.
+- Tightened `CommandAcknowledgementError`, `CommandAcknowledgementResult`, and `commandAcknowledgementError` to use the structured error payload.
 - Marked the matching PRD task complete.
 
 Key decisions:
-- Used an `ok: true` / `ok: false` discriminant because Socket.IO command acknowledgements need a compact success/error result shape.
-- Kept the error payload generic in this slice so the stable machine-readable error code contract remains a separate unchecked task.
+- Used a shared literal error-code vocabulary for common realtime command failures so client and server do not invent ad hoc strings.
+- Kept user-facing copy in `message` rather than deriving it from the code, because different Client flows may need different copy for the same machine-readable failure.
+- Kept optional `details` generic so future command payloads can attach structured context without widening the base contract.
 - Did not add Vitest, Socket.IO wiring, authentication, database, Docker, or product flows.
 
 Blockers:
@@ -29,4 +31,4 @@ Verification:
 - Passed: `npm run build -w @frempower/shared`
 
 Notes for next iteration:
-- A good next task is to define stable command acknowledgement error codes separate from user-facing copy.
+- A good next task is to export initial teacher/student snapshot and realtime payload types, because those contracts will shape the activity service and Socket.IO wiring.

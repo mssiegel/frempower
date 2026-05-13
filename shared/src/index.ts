@@ -22,12 +22,39 @@ export type CommandAcknowledgementSuccess<TData = undefined> = {
   data: TData;
 };
 
-export type CommandAcknowledgementError<TError = unknown> = {
+export const COMMAND_ACKNOWLEDGEMENT_ERROR_CODES = {
+  invalidPayload: "invalid_payload",
+  invalidSession: "invalid_session",
+  validationFailed: "validation_failed",
+  activityNotFound: "activity_not_found",
+  activityUnavailable: "activity_unavailable",
+  forbidden: "forbidden",
+  conflict: "conflict",
+  internalError: "internal_error",
+} as const;
+
+export type CommandAcknowledgementErrorCode =
+  (typeof COMMAND_ACKNOWLEDGEMENT_ERROR_CODES)[keyof typeof COMMAND_ACKNOWLEDGEMENT_ERROR_CODES];
+
+export type CommandAcknowledgementErrorPayload<TDetails = undefined> = {
+  code: CommandAcknowledgementErrorCode;
+  message: string;
+  details?: TDetails;
+};
+
+export type CommandAcknowledgementError<
+  TError extends CommandAcknowledgementErrorPayload =
+    CommandAcknowledgementErrorPayload,
+> = {
   ok: false;
   error: TError;
 };
 
-export type CommandAcknowledgementResult<TData = undefined, TError = unknown> =
+export type CommandAcknowledgementResult<
+  TData = undefined,
+  TError extends CommandAcknowledgementErrorPayload =
+    CommandAcknowledgementErrorPayload,
+> =
   | CommandAcknowledgementSuccess<TData>
   | CommandAcknowledgementError<TError>;
 
@@ -38,7 +65,9 @@ export const commandAcknowledgementSuccess = <TData = undefined>(
   data,
 });
 
-export const commandAcknowledgementError = <TError>(
+export const commandAcknowledgementError = <
+  TError extends CommandAcknowledgementErrorPayload,
+>(
   error: TError,
 ): CommandAcknowledgementError<TError> => ({
   ok: false,
