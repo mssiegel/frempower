@@ -26,6 +26,22 @@ export type CharacterName = string;
 export type StudentRealName = string;
 export type TeacherEmail = string;
 
+export const normalizeCharacterNameForStorage = (
+  characterName: string,
+): CharacterName => characterName.trim();
+
+export const normalizeCharacterNameForComparison = (
+  characterName: string,
+): string => normalizeCharacterNameForStorage(characterName).toLowerCase();
+
+export const normalizeStudentRealNameForStorage = (
+  studentRealName: string,
+): StudentRealName => studentRealName.trim();
+
+export const normalizeStudentRealNameForComparison = (
+  studentRealName: string,
+): string => normalizeStudentRealNameForStorage(studentRealName).toLowerCase();
+
 export type CommandAcknowledgementSuccess<TData = undefined> = {
   ok: true;
   data: TData;

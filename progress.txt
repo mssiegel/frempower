@@ -5,21 +5,17 @@ Current mode:
 - This iteration implemented exactly one unchecked PRD task and left the diff uncommitted for software engineering author review.
 
 Completed:
-- Shared package exports initial teacher/student snapshot and realtime payload types.
+- Shared package exports pure normalization helpers for Character Names and Student Real Names.
 
 Changed:
-- Added shared identity aliases for Join Code, Activity ID, Entity ID, Session ID, Character Name, Student Real Name, and Teacher Email.
-- Added shared realtime event-name constants for initial teacher, student, and chat command/snapshot channels.
-- Added teacher-facing snapshot types for lobby students, active pairings, completed chats, message previews, counts, and Peer Real Name Visibility.
-- Added student-facing snapshot types that expose only the receiving student's state and allowed active pairing context.
-- Added initial realtime command payload/result types and event-to-payload maps for future Client and Realtime Server wiring.
+- Added shared helpers that trim Character Names and Student Real Names for storage while preserving casing and internal spacing.
+- Added shared helpers that trim and lowercase Character Names and Student Real Names for duplicate comparison cues and authoritative validation.
 - Marked the matching PRD task complete.
 
 Key decisions:
-- Kept this iteration type-only so it establishes shared contracts without implementing host, join, pairing, chat UI, Socket.IO handlers, authentication, or persistence.
-- Modeled `ActivityId` and `JoinCode` separately even though V1 uses the same five-digit value, because routes and join commands use those concepts differently.
-- Used ISO timestamp strings for disconnect deadlines in snapshots so the server can remain authoritative while the Client renders display-only countdowns.
-- Kept student snapshots audience-specific and intentionally omitted the Student List and unrelated Pairings.
+- Kept normalization as plain pure functions in `@frempower/shared`, with no schema validation library.
+- Split storage normalization from comparison normalization so saved names can preserve teacher/student casing while duplicate checks remain case-insensitive.
+- Did not add Vitest in this iteration because that is a separate unchecked PRD task.
 
 Blockers:
 - None.
@@ -33,4 +29,4 @@ Verification:
 - Passed: `npm run build -w @frempower/shared`
 
 Notes for next iteration:
-- A good next task is to export pure normalization helpers for Character Names and Student Real Names, because server validation and future Client duplicate-name cues both depend on the same trimming and case-normalization rules.
+- A good next task is to add Vitest for shared and server tests, because the new helpers and upcoming activity service behavior need executable coverage.
