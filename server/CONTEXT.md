@@ -10,11 +10,11 @@ _Avoid_: User, account, member
 
 **Teacher**:
 A chat participant who can pair students for chats.
-_Avoid_: Admin, instructor account
+_Avoid_: Admin, instructor account, access-controlled role
 
 **Student**:
 A chat participant who can be paired into a chat by a teacher.
-_Avoid_: Learner account, pupil
+_Avoid_: Learner account, pupil, access-controlled role
 
 **Pairing**:
 An assignment that connects students so they can chat in real time.
@@ -91,3 +91,4 @@ _Avoid_: Username, account name
 - "login" means **In-Memory Login**, not durable authentication.
 - "name" means **Display Name**, not a unique account identifier.
 - "saved" means retained in server memory for the current process, not stored in a database.
+- "teacher" and "student" mean current-activity participant modes, not access-controlled roles.

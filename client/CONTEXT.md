@@ -25,7 +25,7 @@ The open client experience where a student can identify themselves and participa
 _Avoid_: Student dashboard, student portal
 
 **Student List**:
-The live list of students who have completed display-name-only login during the current server process.
+The live list of students who have completed **In-Memory Login** during the current server process.
 _Avoid_: Roster, class list
 
 **Display Name**:
@@ -83,5 +83,5 @@ _Avoid_: WebSocket, polling stream
 ## Flagged ambiguities
 
 - "client" means the browser-facing **Client**, not a customer or external consumer.
-- "teacher" and "student" name open experiences, not access-controlled roles.
-- "login" means joining the current in-memory activity, not proving identity.
+- "teacher" and "student" name open experiences in the **Client**, not access-controlled roles.
+- "login" means **In-Memory Login** into the current in-memory activity, not proving identity.
