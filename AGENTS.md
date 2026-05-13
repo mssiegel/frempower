@@ -15,3 +15,7 @@ This repo uses a multi-context domain layout with separate client and server con
 ### Pre-commit workflow
 
 This repo uses Husky, lint-staged, and Prettier for commit checks. See `docs/agents/pre-commit.md`.
+
+### Codex Windows runtime
+
+When Codex shell commands fail with `CreateProcessAsUserW failed: 1312`, follow the narrow escalation guidance in `docs/agents/codex-windows.md`.
