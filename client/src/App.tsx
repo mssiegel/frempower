@@ -1,6 +1,7 @@
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import { createBrowserRouter, Link as RouterLink, RouterProvider } from 'react-router-dom';
 import './index.css';
+import { useRealtimeConnection } from './realtime';
 
 function Homepage() {
   return (
@@ -80,11 +81,15 @@ function PagePlaceholder({
   eyebrow,
   title,
   description,
+  usesRealtimeConnection = false,
 }: {
   eyebrow: string;
   title: string;
   description: string;
+  usesRealtimeConnection?: boolean;
 }) {
+  const realtimeConnection = usesRealtimeConnection ? <RealtimeConnectionStatus /> : null;
+
   return (
     <Box component="main" className="app-shell">
       <Container maxWidth="md">
@@ -122,6 +127,7 @@ function PagePlaceholder({
           >
             {description}
           </Typography>
+          {realtimeConnection}
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <Button href="/teacher" size="large" variant="contained">
               Teacher Page
@@ -133,6 +139,22 @@ function PagePlaceholder({
         </Stack>
       </Container>
     </Box>
+  );
+}
+
+function RealtimeConnectionStatus() {
+  const { isConnected } = useRealtimeConnection();
+
+  return (
+    <Typography
+      sx={{
+        color: isConnected ? 'secondary.main' : 'text.secondary',
+        fontSize: '0.9375rem',
+        fontWeight: 700,
+      }}
+    >
+      Realtime Connection: {isConnected ? 'Connected' : 'Connecting'}
+    </Typography>
   );
 }
 
@@ -148,6 +170,7 @@ const router = createBrowserRouter([
         description="The Teacher Page will show the student list, active pairings, and completed chats for a live activity."
         eyebrow="Open experience"
         title="Teacher Page"
+        usesRealtimeConnection
       />
     ),
   },
@@ -158,6 +181,7 @@ const router = createBrowserRouter([
         description="The Student Page will let a student enter a display name and participate in an assigned chat."
         eyebrow="Open experience"
         title="Student Page"
+        usesRealtimeConnection
       />
     ),
   },

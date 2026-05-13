@@ -58,8 +58,8 @@ Text:
 - [x] Add visible placeholder pages for Homepage, Teacher Page, and Student Page.
 - [x] Give the Homepage SEO-oriented metadata and semantic content structure.
 - [x] Scaffold the Server with Node.js, Express, TypeScript, and Socket.IO.
-- [ ] Add a health check endpoint.
-- [ ] Add basic Socket.IO connection wiring. only teachers page and students page need socket connections (not the homepage)
+- [x] Add a health check endpoint.
+- [x] Add basic Socket.IO connection wiring. only teachers page and students page need socket connections (not the homepage)
 - [ ] Configure Client local access to the Server and Socket.IO endpoint.
 - [ ] Add root build, lint, test, and dev commands.
 - [ ] Make build, lint, and test pass.
