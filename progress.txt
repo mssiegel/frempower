@@ -27,6 +27,12 @@ Changed:
 - Added Homepage SEO-oriented HTML metadata.
 - Replaced the Homepage placeholder with semantic header, navigation, main, section, heading, and list structure.
 - Marked the completed Homepage SEO and semantic structure PRD task as done.
+- Added Server dependencies for Express and Socket.IO.
+- Added Server dev dependencies for TypeScript, tsx, and Node/Express types.
+- Added Server build, dev, and start package scripts.
+- Added Server TypeScript configuration.
+- Added a minimal Server entrypoint that starts an Express HTTP server with Socket.IO attached.
+- Marked the completed Server scaffold PRD task as done.
 
 Verification:
 - Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
@@ -37,3 +43,4 @@ Verification:
 - Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding the Client routes.
 - Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding visible placeholder pages.
 - Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding Homepage metadata and semantic content.
+- Ran `npm run build -w server`; TypeScript compilation completed successfully after scaffolding the Server.

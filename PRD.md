@@ -57,7 +57,7 @@ Text:
 - [x] Add routes for `/`, `/teacher`, and `/student`.
 - [x] Add visible placeholder pages for Homepage, Teacher Page, and Student Page.
 - [x] Give the Homepage SEO-oriented metadata and semantic content structure.
-- [ ] Scaffold the Server with Node.js, Express, TypeScript, and Socket.IO.
+- [x] Scaffold the Server with Node.js, Express, TypeScript, and Socket.IO.
 - [ ] Add a health check endpoint.
 - [ ] Add basic Socket.IO connection wiring. only teachers page and students page need socket connections (not the homepage)
 - [ ] Configure Client local access to the Server and Socket.IO endpoint.
