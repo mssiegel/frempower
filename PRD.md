@@ -40,7 +40,7 @@ This slice should not implement the full host, join, pairing, or chat UI flows y
 - [x] Activity service accepts or centralizes clock/random/join-code dependencies so tests can be deterministic.
 - [x] Activity service does not import or directly use Socket.IO.
 - [ ] Add or preserve system ADR `docs/adr/0002-realtime-session-contracts.md`.
-- [ ] Tests cover shared constants/helpers, acknowledgement result helpers if present, Join Code generation collision retry, and basic activity service construction.
+- [x] Tests cover shared constants/helpers, acknowledgement result helpers if present, Join Code generation collision retry, and basic activity service construction.
 - [ ] Confirm with software engineering author that its okay for Ralph to automatically push this branc to github merge it into git Main and then close the related Github issue.
 
 ## Constraints
