@@ -5,27 +5,20 @@ Current mode:
 - This iteration implemented exactly one unchecked PRD task and left the diff uncommitted for software engineering author review.
 
 Completed:
-- Activity service accepts or centralizes clock/random/join-code dependencies so tests can be deterministic.
+- Activity service does not import or directly use Socket.IO.
 
 Changed:
-- Added activity service dependency types for clock, random, and Join Code generation.
-- Added default dependency factories backed by `Date`, `Math.random`, and the shared Join Code range.
-- Added a deterministic random Join Code generator that retries when a generated Join Code is already reserved.
-- Added narrow Join Code reservation and release methods to the activity service without creating host or join flows.
-- Added focused server tests for dependency overrides and Join Code collision retry.
+- Added a focused server architecture test that reads the activity service source and fails if it imports Socket.IO.
 - Marked the matching PRD task complete.
 
 Key decisions:
-- The activity service now accepts dependency overrides during construction, while host/join mutation flows remain out of scope for this iteration.
-- Join Code reservation is intentionally narrower than hosting a Classroom Activity; it only centralizes the reusable dependency-backed allocation behavior.
-- Join Code generation stays in the activity service module instead of Socket.IO handlers so future host behavior can be tested without transport wiring.
-- The broader PRD testing task remains unchecked because shared helper and acknowledgement tests are not yet complete.
+- Kept the guardrail in the server test suite because the boundary belongs to server architecture, not shared contracts.
+- Checked only direct Socket.IO imports in the activity service so the test enforces the transport boundary without overreaching into general dependency policy.
 
 Blockers:
 - None.
 
 Files changed:
-- `server/src/activity/activityService.ts`
 - `server/src/activity/activityService.test.ts`
 - `PRD.md`
 - `progress.txt`
@@ -34,4 +27,4 @@ Verification:
 - Passed: `npm test -w @frempower/server`
 
 Notes for next iteration:
-- A good next task is to verify and mark that the activity service does not import or directly use Socket.IO, or complete the broader shared/server test coverage task if the author wants more executable guardrails next.
+- A good next task is to complete the broader shared/server test coverage task, because Join Code collision retry already has coverage and the remaining gap is shared constants/helpers and acknowledgement result helpers.

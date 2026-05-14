@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { JoinCode } from "@frempower/shared";
 import {
@@ -5,6 +6,18 @@ import {
   createInMemoryActivityService,
   createRandomJoinCodeGenerator,
 } from "./activityService.js";
+
+describe("activity service architecture", () => {
+  it("does not import Socket.IO transport concerns", () => {
+    const source = readFileSync(
+      new URL("./activityService.ts", import.meta.url),
+      "utf8",
+    );
+
+    expect(source).not.toMatch(/from\s+["']socket\.io["']/);
+    expect(source).not.toMatch(/require\(["']socket\.io["']\)/);
+  });
+});
 
 describe("activity service dependencies", () => {
   it("accepts deterministic clock, random, and Join Code dependencies", () => {
