@@ -176,7 +176,7 @@ _Avoid_: WebSocket, polling stream
 - The teacher cannot host or save **Character List** changes until the draft has at least two distinct non-empty **Character Names**.
 - Duplicate **Character Names** are allowed while editing a draft **Character List**, but they block hosting or saving.
 - **Character Name** duplicate validation trims whitespace and compares names case-insensitively.
-- Saved **Character Names** preserve the teacher's chosen casing for display.
+- Applied **Character Names** preserve the teacher's chosen casing for display.
 - The **Teacher Page** does not ask for a teacher name in version 1.
 - The **Teacher Page** can host an activity with or without a **Teacher Email**.
 - The teacher can enter or update **Teacher Email** while the **Classroom Activity** is live.
@@ -343,10 +343,12 @@ _Avoid_: WebSocket, polling stream
 ## Flagged ambiguities
 
 - "client" means the browser-facing **Client**, not a customer or external consumer.
-- "teacher" and "student" name open experiences in the **Client**, not access-controlled roles.
-- "login" means **In-Memory Login** into the current in-memory activity, not proving identity.
+- "teacher" and "student" name open experiences and current-activity participant modes, not access-controlled roles.
+- **In-Memory Login** is an internal domain term only. User-facing copy should use actions such as "Host activity", "Join activity", or "Resume activity"; avoid "login", "sign in", and "sign up".
 - "student name" should be clarified as **Student Real Name** or **Character Name**.
+- The student-facing label for **Student Real Name** is "Your name"; avoid "display name".
 - "join code" means the five-digit **Join Code** for a live **Classroom Activity**, not durable account access.
-- "activity ID" means the route form of the five-digit **Join Code** in version 1, not a separate durable identifier.
 - The user-facing label is **Join Code**, not PIN.
+- "activity ID" means the route form of the five-digit **Join Code** in version 1, not a separate durable identifier or user-facing label.
 - "socket ID" is transport-level debug information, not a **Session ID** or participant identity.
+- Avoid user-facing "saved" language for version 1 activity state. Prefer "updated", "applied", or "retained in server memory for the current process", depending on context.

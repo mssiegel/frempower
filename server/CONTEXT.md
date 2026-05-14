@@ -172,9 +172,9 @@ _Avoid_: Authentication, sign-up, account creation
 - Edits to the **Character List** affect only future **Pairings**.
 - Existing **Active Pairings** and **Completed Chats** keep the **Character Names** they already received.
 - A draft **Character List** can temporarily have fewer than two distinct non-empty **Character Names** while the teacher is editing in the **Client**.
-- The server accepts hosting or saved **Character List** changes only when there are at least two distinct non-empty **Character Names**.
+- The server accepts hosting or applied **Character List** changes only when there are at least two distinct non-empty **Character Names**.
 - **Character Name** duplicate validation trims whitespace and compares names case-insensitively.
-- Saved **Character Names** preserve the teacher's chosen casing for display.
+- Applied **Character Names** preserve the teacher's chosen casing for display.
 - A **Student** must provide a **Student Real Name** so the teacher can identify them.
 - Duplicate **Student Real Names** are allowed in the same **Classroom Activity**.
 - The same **Student Real Name** can join the same **Classroom Activity** from multiple browser tabs as separate live students.
@@ -300,11 +300,12 @@ _Avoid_: Authentication, sign-up, account creation
 
 ## Flagged ambiguities
 
-- "login" means **In-Memory Login**, not durable authentication.
+- **In-Memory Login** is an internal domain term only. User-facing copy should use actions such as "Host activity", "Join activity", or "Resume activity"; avoid "login", "sign in", and "sign up".
 - "student name" should be clarified as **Student Real Name** or **Character Name**.
+- The student-facing label for **Student Real Name** is "Your name"; avoid "display name".
 - "join code" means the five-digit **Join Code** for a live **Classroom Activity**, not durable account access.
-- "activity ID" means the route form of the five-digit **Join Code** in version 1, not a separate durable identifier.
 - The user-facing label is **Join Code**, not PIN.
+- "activity ID" means the route form of the five-digit **Join Code** in version 1, not a separate durable identifier or user-facing label.
 - "socket ID" is transport-level debug information, not a **Session ID** or participant identity.
-- "saved" means retained in server memory for the current process, not stored in a database.
+- Avoid user-facing "saved" language for version 1 activity state. Prefer "updated", "applied", or "retained in server memory for the current process", depending on context.
 - "teacher" and "student" mean current-activity participant modes, not access-controlled roles.

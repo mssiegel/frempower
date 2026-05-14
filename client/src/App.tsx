@@ -119,7 +119,7 @@ function Homepage() {
                   two students.
                 </li>
                 <li>
-                  Students can prepare to join with a display name and chat when
+                  Students can prepare to join with their name and chat when
                   paired.
                 </li>
                 <li>
@@ -238,7 +238,7 @@ const router = createBrowserRouter([
     path: "/student",
     element: (
       <PagePlaceholder
-        description="The Student Page will let a student enter a display name and participate in an assigned chat."
+        description="The Student Page will let a student enter their name and participate in an assigned chat."
         eyebrow="Open experience"
         title="Student Page"
         usesRealtimeConnection
