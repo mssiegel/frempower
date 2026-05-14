@@ -5,33 +5,34 @@ Current mode:
 - This iteration implemented exactly one unchecked PRD task and left the diff uncommitted for software engineering author review.
 
 Completed:
-- Add Vitest for shared and server tests.
+- Create an in-memory activity service/store skeleton separate from Socket.IO handlers.
 
 Changed:
-- Added Vitest as a root workspace dev dependency so shared and server tests use the same runner version.
-- Updated the shared package test script to run Vitest, then TypeScript checking.
-- Updated the server package test script to run Vitest, then TypeScript checking.
+- Added `server/src/activity/activityService.ts` with an in-memory activity service factory.
+- Defined the initial `ClassroomActivityRecord`, service change, subscriber, and read API types.
+- Kept the activity service free of Socket.IO imports and transport concepts.
+- Created a server singleton activity service in `server/src/index.ts` without adding host, join, pairing, or chat flows.
+- Added `@frempower/shared` as an explicit server workspace dependency for shared domain contract types.
 - Marked the matching PRD task complete.
 
 Key decisions:
-- Kept actual test coverage for the separate unchecked PRD task that asks tests to cover shared constants/helpers, acknowledgement helpers, Join Code collision retry, and activity service construction.
-- Used `--passWithNoTests` because this iteration adds the test runner foundation before test files exist.
-- Preserved `tsc --noEmit` in package test scripts so the existing type-check feedback loop remains part of `npm test`.
+- The skeleton currently exposes `subscribe`, `getActivity`, and `listActivities` only, leaving mutation commands for later focused tasks.
+- Activity records are cloned on read so future domain state is not accidentally mutated by callers.
+- Dependency injection for clock, random, and Join Code generation remains a separate unchecked task.
 
 Blockers:
 - None.
 
 Files changed:
-- `package.json`
-- `package-lock.json`
-- `shared/package.json`
+- `server/src/activity/activityService.ts`
+- `server/src/index.ts`
 - `server/package.json`
+- `package-lock.json`
 - `PRD.md`
 - `progress.txt`
 
 Verification:
-- Passed: `npm test -w @frempower/shared`
 - Passed: `npm test -w @frempower/server`
 
 Notes for next iteration:
-- A good next task is to create the in-memory activity service/store skeleton separate from Socket.IO handlers, then add focused construction and dependency-injection tests once the skeleton exists.
+- A good next task is to make the activity service accept or centralize clock, random, and Join Code dependencies so deterministic Join Code collision retry tests can be added.
