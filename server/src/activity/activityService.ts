@@ -5,6 +5,7 @@ import type {
   SessionId,
   TeacherEmail,
 } from "@frempower/shared";
+import { JOIN_CODE_MAX, JOIN_CODE_MIN } from "@frempower/shared";
 
 export type ClassroomActivityStatus = "live" | "ended";
 
@@ -34,12 +35,83 @@ export type ActivityServiceSubscriber = (
 
 export type ActivityService = {
   subscribe(subscriber: ActivityServiceSubscriber): () => void;
+  reserveJoinCode(): JoinCode;
+  releaseJoinCode(joinCode: JoinCode): void;
   getActivity(activityId: ActivityId): ClassroomActivityRecord | undefined;
   listActivities(): ClassroomActivityRecord[];
 };
 
-export const createInMemoryActivityService = (): ActivityService => {
+export type ActivityServiceClock = {
+  now(): Date;
+};
+
+export type ActivityServiceRandom = {
+  next(): number;
+};
+
+export type ActivityServiceJoinCodeGenerator = (
+  reservedJoinCodes: ReadonlySet<JoinCode>,
+) => JoinCode;
+
+export type ActivityServiceDependencies = {
+  clock: ActivityServiceClock;
+  random: ActivityServiceRandom;
+  generateJoinCode: ActivityServiceJoinCodeGenerator;
+};
+
+export type CreateInMemoryActivityServiceOptions = {
+  dependencies?: Partial<ActivityServiceDependencies>;
+};
+
+const createDefaultClock = (): ActivityServiceClock => ({
+  now: () => new Date(),
+});
+
+const createDefaultRandom = (): ActivityServiceRandom => ({
+  next: () => Math.random(),
+});
+
+export const createRandomJoinCodeGenerator =
+  (random: ActivityServiceRandom): ActivityServiceJoinCodeGenerator =>
+  (reservedJoinCodes) => {
+    const joinCodeRangeSize = JOIN_CODE_MAX - JOIN_CODE_MIN + 1;
+    const maxAttempts = joinCodeRangeSize;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const randomOffset = Math.min(
+        Math.floor(random.next() * joinCodeRangeSize),
+        joinCodeRangeSize - 1,
+      );
+      const joinCode = String(JOIN_CODE_MIN + randomOffset) as JoinCode;
+
+      if (!reservedJoinCodes.has(joinCode)) {
+        return joinCode;
+      }
+    }
+
+    throw new Error("Unable to generate an available Join Code");
+  };
+
+export const createActivityServiceDependencies = (
+  overrides: Partial<ActivityServiceDependencies> = {},
+): ActivityServiceDependencies => {
+  const clock = overrides.clock ?? createDefaultClock();
+  const random = overrides.random ?? createDefaultRandom();
+
+  return {
+    clock,
+    random,
+    generateJoinCode:
+      overrides.generateJoinCode ?? createRandomJoinCodeGenerator(random),
+  };
+};
+
+export const createInMemoryActivityService = (
+  options: CreateInMemoryActivityServiceOptions = {},
+): ActivityService => {
+  const dependencies = createActivityServiceDependencies(options.dependencies);
   const activities = new Map<ActivityId, ClassroomActivityRecord>();
+  const reservedJoinCodes = new Set<JoinCode>();
   const subscribers = new Set<ActivityServiceSubscriber>();
 
   const cloneActivity = (
@@ -56,6 +128,17 @@ export const createInMemoryActivityService = (): ActivityService => {
       return () => {
         subscribers.delete(subscriber);
       };
+    },
+
+    reserveJoinCode() {
+      const joinCode = dependencies.generateJoinCode(reservedJoinCodes);
+      reservedJoinCodes.add(joinCode);
+
+      return joinCode;
+    },
+
+    releaseJoinCode(joinCode) {
+      reservedJoinCodes.delete(joinCode);
     },
 
     getActivity(activityId) {

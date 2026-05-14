@@ -37,7 +37,7 @@ This slice should not implement the full host, join, pairing, or chat UI flows y
 - [x] Shared package exports pure normalization helpers for Character Names and Student Real Names.
 - [x] Add Vitest for shared and server tests.
 - [x] Create an in-memory activity service/store skeleton separate from Socket.IO handlers.
-- [ ] Activity service accepts or centralizes clock/random/join-code dependencies so tests can be deterministic.
+- [x] Activity service accepts or centralizes clock/random/join-code dependencies so tests can be deterministic.
 - [ ] Activity service does not import or directly use Socket.IO.
 - [ ] Add or preserve system ADR `docs/adr/0002-realtime-session-contracts.md`.
 - [ ] Tests cover shared constants/helpers, acknowledgement result helpers if present, Join Code generation collision retry, and basic activity service construction.

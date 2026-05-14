@@ -5,29 +5,28 @@ Current mode:
 - This iteration implemented exactly one unchecked PRD task and left the diff uncommitted for software engineering author review.
 
 Completed:
-- Create an in-memory activity service/store skeleton separate from Socket.IO handlers.
+- Activity service accepts or centralizes clock/random/join-code dependencies so tests can be deterministic.
 
 Changed:
-- Added `server/src/activity/activityService.ts` with an in-memory activity service factory.
-- Defined the initial `ClassroomActivityRecord`, service change, subscriber, and read API types.
-- Kept the activity service free of Socket.IO imports and transport concepts.
-- Created a server singleton activity service in `server/src/index.ts` without adding host, join, pairing, or chat flows.
-- Added `@frempower/shared` as an explicit server workspace dependency for shared domain contract types.
+- Added activity service dependency types for clock, random, and Join Code generation.
+- Added default dependency factories backed by `Date`, `Math.random`, and the shared Join Code range.
+- Added a deterministic random Join Code generator that retries when a generated Join Code is already reserved.
+- Added narrow Join Code reservation and release methods to the activity service without creating host or join flows.
+- Added focused server tests for dependency overrides and Join Code collision retry.
 - Marked the matching PRD task complete.
 
 Key decisions:
-- The skeleton currently exposes `subscribe`, `getActivity`, and `listActivities` only, leaving mutation commands for later focused tasks.
-- Activity records are cloned on read so future domain state is not accidentally mutated by callers.
-- Dependency injection for clock, random, and Join Code generation remains a separate unchecked task.
+- The activity service now accepts dependency overrides during construction, while host/join mutation flows remain out of scope for this iteration.
+- Join Code reservation is intentionally narrower than hosting a Classroom Activity; it only centralizes the reusable dependency-backed allocation behavior.
+- Join Code generation stays in the activity service module instead of Socket.IO handlers so future host behavior can be tested without transport wiring.
+- The broader PRD testing task remains unchecked because shared helper and acknowledgement tests are not yet complete.
 
 Blockers:
 - None.
 
 Files changed:
 - `server/src/activity/activityService.ts`
-- `server/src/index.ts`
-- `server/package.json`
-- `package-lock.json`
+- `server/src/activity/activityService.test.ts`
 - `PRD.md`
 - `progress.txt`
 
@@ -35,4 +34,4 @@ Verification:
 - Passed: `npm test -w @frempower/server`
 
 Notes for next iteration:
-- A good next task is to make the activity service accept or centralize clock, random, and Join Code dependencies so deterministic Join Code collision retry tests can be added.
+- A good next task is to verify and mark that the activity service does not import or directly use Socket.IO, or complete the broader shared/server test coverage task if the author wants more executable guardrails next.
