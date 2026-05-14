@@ -5,28 +5,33 @@ Current mode:
 - This iteration implemented exactly one unchecked PRD task and left the diff uncommitted for software engineering author review.
 
 Completed:
-- Shared package exports pure normalization helpers for Character Names and Student Real Names.
+- Add Vitest for shared and server tests.
 
 Changed:
-- Added shared helpers that trim Character Names and Student Real Names for storage while preserving casing and internal spacing.
-- Added shared helpers that trim and lowercase Character Names and Student Real Names for duplicate comparison cues and authoritative validation.
+- Added Vitest as a root workspace dev dependency so shared and server tests use the same runner version.
+- Updated the shared package test script to run Vitest, then TypeScript checking.
+- Updated the server package test script to run Vitest, then TypeScript checking.
 - Marked the matching PRD task complete.
 
 Key decisions:
-- Kept normalization as plain pure functions in `@frempower/shared`, with no schema validation library.
-- Split storage normalization from comparison normalization so saved names can preserve teacher/student casing while duplicate checks remain case-insensitive.
-- Did not add Vitest in this iteration because that is a separate unchecked PRD task.
+- Kept actual test coverage for the separate unchecked PRD task that asks tests to cover shared constants/helpers, acknowledgement helpers, Join Code collision retry, and activity service construction.
+- Used `--passWithNoTests` because this iteration adds the test runner foundation before test files exist.
+- Preserved `tsc --noEmit` in package test scripts so the existing type-check feedback loop remains part of `npm test`.
 
 Blockers:
 - None.
 
 Files changed:
-- `shared/src/index.ts`
+- `package.json`
+- `package-lock.json`
+- `shared/package.json`
+- `server/package.json`
 - `PRD.md`
 - `progress.txt`
 
 Verification:
-- Passed: `npm run build -w @frempower/shared`
+- Passed: `npm test -w @frempower/shared`
+- Passed: `npm test -w @frempower/server`
 
 Notes for next iteration:
-- A good next task is to add Vitest for shared and server tests, because the new helpers and upcoming activity service behavior need executable coverage.
+- A good next task is to create the in-memory activity service/store skeleton separate from Socket.IO handlers, then add focused construction and dependency-injection tests once the skeleton exists.

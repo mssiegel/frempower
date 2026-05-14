@@ -35,7 +35,7 @@ This slice should not implement the full host, join, pairing, or chat UI flows y
 - [x] Command acknowledgement errors support stable machine-readable error codes separate from user-facing copy.
 - [x] Shared package exports initial teacher/student snapshot and realtime payload types.
 - [x] Shared package exports pure normalization helpers for Character Names and Student Real Names.
-- [ ] Add Vitest for shared and server tests.
+- [x] Add Vitest for shared and server tests.
 - [ ] Create an in-memory activity service/store skeleton separate from Socket.IO handlers.
 - [ ] Activity service accepts or centralizes clock/random/join-code dependencies so tests can be deterministic.
 - [ ] Activity service does not import or directly use Socket.IO.

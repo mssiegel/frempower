@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit",
-    "test": "tsc --noEmit"
+    "test": "vitest run --passWithNoTests && tsc --noEmit"
   },
   "devDependencies": {
     "typescript": "^6.0.3"
