@@ -42,21 +42,22 @@ Completed criteria:
 - `local/issues/004-recover-authoritative-state-after-reconnect.md`: Tests cover reconnecting after a missed state change and receiving the current snapshot on the newest socket.
 - `local/issues/004-recover-authoritative-state-after-reconnect.md`: The Socket.IO layer does not make socket IDs participant identity.
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover explicit heartbeat configuration.
+- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover one **Session ID** allowing only one live socket.
 
 Changed:
-- Added a heartbeat regression test that asserts the Realtime Server uses explicit Socket.IO `pingInterval` and `pingTimeout` values.
+- Renamed the existing connection registry regression test to state the V1 boundary contract in repo domain language: one **Session ID** allows only one live **Realtime Connection**.
 - Marked the matching acceptance criterion complete in `local/issues/005-add-realtime-boundary-regression-tests.md`.
 
 Key decisions:
-- Selected the topmost unchecked criterion: tests cover explicit heartbeat configuration.
-- Kept the change at the test boundary because the production heartbeat settings were already implemented.
-- Used exact values in the regression test so future accidental defaulting or option drift is caught.
+- Selected the topmost unchecked criterion: tests cover one **Session ID** allowing only one live socket.
+- Kept the change at the test boundary because the production registry behavior was already implemented and covered.
+- Used the domain term **Realtime Connection** in the regression name while preserving the existing assertions that stale sockets are not retained.
 
 Blockers:
 - None.
 
 Files changed:
-- `server/src/realtime/heartbeat.test.ts`
+- `server/src/realtime/connectionRegistry.test.ts`
 - `local/issues/005-add-realtime-boundary-regression-tests.md`
 - `progress.txt`
 
@@ -64,4 +65,4 @@ Verification:
 - Passed: `npm run test -w server`
 
 Recommended next iteration:
-- Continue `local/issues/005-add-realtime-boundary-regression-tests.md` with the next unchecked criterion: Tests cover one **Session ID** allowing only one live socket.
+- Continue `local/issues/005-add-realtime-boundary-regression-tests.md` with the next unchecked criterion: Tests cover a newer socket replacing an older socket for the same **Session ID**.

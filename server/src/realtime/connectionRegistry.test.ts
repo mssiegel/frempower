@@ -28,7 +28,7 @@ describe("realtime connection registry", () => {
     ]);
   });
 
-  it("enforces one live transport socket per Session ID", () => {
+  it("allows only one live Realtime Connection for one Session ID", () => {
     const registry = createRealtimeConnectionRegistry();
     const teacherSessionId = "teacher-session-1" as SessionId;
 

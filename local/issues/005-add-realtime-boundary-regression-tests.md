@@ -11,7 +11,7 @@ This slice should focus on boundary behavior rather than exhaustive product flow
 ## Acceptance criteria
 
 - [x] Tests cover explicit heartbeat configuration.
-- [ ] Tests cover one **Session ID** allowing only one live socket.
+- [x] Tests cover one **Session ID** allowing only one live socket.
 - [ ] Tests cover a newer socket replacing an older socket for the same **Session ID**.
 - [ ] Tests cover current-socket disconnect behavior.
 - [ ] Tests cover rejoining rooms after reconnect or resume.
