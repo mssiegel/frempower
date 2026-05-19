@@ -22,4 +22,18 @@ describe("realtime connection registry", () => {
       studentSessionId,
     ]);
   });
+
+  it("allows one Session ID to have multiple simultaneous transport sockets", () => {
+    const registry = createRealtimeConnectionRegistry();
+    const teacherSessionId = "teacher-session-1" as SessionId;
+
+    registry.registerSessionSocket(teacherSessionId, "teacher-socket-1");
+    registry.registerSessionSocket(teacherSessionId, "teacher-socket-2");
+
+    expect(registry.getSocketIds(teacherSessionId)).toEqual([
+      "teacher-socket-1",
+      "teacher-socket-2",
+    ]);
+    expect(registry.getSessionIds()).toEqual([teacherSessionId]);
+  });
 });
