@@ -36,4 +36,18 @@ describe("realtime connection registry", () => {
     ]);
     expect(registry.getSessionIds()).toEqual([teacherSessionId]);
   });
+
+  it("considers a Session ID connected while it has at least one registered transport socket", () => {
+    const registry = createRealtimeConnectionRegistry();
+    const teacherSessionId = "teacher-session-1" as SessionId;
+    const unknownSessionId = "unknown-session" as SessionId;
+
+    expect(registry.isSessionConnected(teacherSessionId)).toBe(false);
+
+    registry.registerSessionSocket(teacherSessionId, "teacher-socket-1");
+    registry.registerSessionSocket(teacherSessionId, "teacher-socket-2");
+
+    expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
+    expect(registry.isSessionConnected(unknownSessionId)).toBe(false);
+  });
 });

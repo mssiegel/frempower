@@ -7,6 +7,7 @@ export type RealtimeConnectionRegistry = {
     sessionId: SessionId,
     socketId: TransportSocketId,
   ): void;
+  isSessionConnected(sessionId: SessionId): boolean;
   getSocketIds(sessionId: SessionId): readonly TransportSocketId[];
   getSessionIds(): readonly SessionId[];
 };
@@ -20,6 +21,10 @@ export const createRealtimeConnectionRegistry =
         const socketIds = socketsBySessionId.get(sessionId) ?? new Set();
         socketIds.add(socketId);
         socketsBySessionId.set(sessionId, socketIds);
+      },
+
+      isSessionConnected(sessionId) {
+        return (socketsBySessionId.get(sessionId)?.size ?? 0) > 0;
       },
 
       getSocketIds(sessionId) {
