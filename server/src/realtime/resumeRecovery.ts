@@ -1,6 +1,7 @@
 import type {
   ActivityId,
   CommandAcknowledgementResult,
+  EntityId,
   SessionId,
   StudentActivitySnapshot,
   TeacherActivitySnapshot,
@@ -19,10 +20,15 @@ import type {
   TransportSocketId,
 } from "./connectionRegistry.js";
 import {
+  emitStudentActivitySnapshotToSessionRoom,
   emitTeacherActivitySnapshotToRoom,
   type RealtimeRoomDeliveryServer,
 } from "./roomDelivery.js";
-import { getSessionRoomName, getTeacherActivityRoomName } from "./roomNames.js";
+import {
+  getPairingRoomName,
+  getSessionRoomName,
+  getTeacherActivityRoomName,
+} from "./roomNames.js";
 
 export type RealtimeResumeSocket = {
   id: TransportSocketId;
@@ -38,7 +44,23 @@ export type TeacherResumeRecoverySuccess = {
   sessionId: SessionId;
 };
 
+export type StudentResumeRecoverySuccess = {
+  activityId: ActivityId;
+  pairingId?: EntityId;
+  sessionId: SessionId;
+};
+
 export type SendTeacherResumeRecoverySnapshotOptions = {
+  activityService: Pick<ActivityService, "getActivity">;
+  deliveryServer: RealtimeRoomDeliveryServer;
+  registry: RealtimeConnectionRegistry;
+  socketReplacement: RealtimeResumeSocketReplacement;
+  socket: RealtimeResumeSocket;
+  sessionId: SessionId;
+  activityId: ActivityId;
+};
+
+export type SendStudentResumeRecoverySnapshotOptions = {
   activityService: Pick<ActivityService, "getActivity">;
   deliveryServer: RealtimeRoomDeliveryServer;
   registry: RealtimeConnectionRegistry;
@@ -136,6 +158,56 @@ export const sendTeacherResumeRecoverySnapshot = ({
 
   return commandAcknowledgementSuccess({
     activityId,
+    sessionId,
+  });
+};
+
+export const sendStudentResumeRecoverySnapshot = ({
+  activityService,
+  deliveryServer,
+  registry,
+  socketReplacement,
+  socket,
+  sessionId,
+  activityId,
+}: SendStudentResumeRecoverySnapshotOptions): CommandAcknowledgementResult<StudentResumeRecoverySuccess> => {
+  const activity = activityService.getActivity(activityId);
+
+  if (activity === undefined) {
+    return commandAcknowledgementError({
+      code: COMMAND_ACKNOWLEDGEMENT_ERROR_CODES.activityNotFound,
+      message: "Classroom Activity is not available.",
+    });
+  }
+
+  const snapshot = buildStudentActivitySnapshot(activity, sessionId);
+  if (snapshot === undefined) {
+    return commandAcknowledgementError({
+      code: COMMAND_ACKNOWLEDGEMENT_ERROR_CODES.forbidden,
+      message: "Session ID cannot resume this Classroom Activity.",
+    });
+  }
+
+  const registration = registry.registerSessionSocket(sessionId, socket.id);
+  if (registration.replacedSocketId !== undefined) {
+    socketReplacement.disconnectSocket(registration.replacedSocketId);
+  }
+
+  socket.join(getSessionRoomName(sessionId));
+  if (snapshot.activePairing !== undefined) {
+    socket.join(getPairingRoomName(snapshot.activePairing.id));
+  }
+
+  emitStudentActivitySnapshotToSessionRoom(
+    deliveryServer,
+    registry,
+    sessionId,
+    snapshot
+  );
+
+  return commandAcknowledgementSuccess({
+    activityId,
+    pairingId: snapshot.activePairing?.id,
     sessionId,
   });
 };

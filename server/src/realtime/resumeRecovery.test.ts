@@ -20,6 +20,7 @@ import type {
 import {
   buildStudentActivitySnapshot,
   buildTeacherActivitySnapshot,
+  sendStudentResumeRecoverySnapshot,
   sendTeacherResumeRecoverySnapshot,
   type RealtimeResumeSocket,
 } from "./resumeRecovery.js";
@@ -56,6 +57,36 @@ const createDeliveryServer = () => {
             roomName,
             eventName,
             payload: payload as TeacherActivitySnapshot,
+          });
+        },
+      };
+
+      return target;
+    },
+  };
+
+  return { emitted, server };
+};
+
+const createStudentDeliveryServer = () => {
+  const emitted: Array<{
+    roomName: string;
+    eventName: string;
+    payload: StudentActivitySnapshot;
+  }> = [];
+
+  const server: RealtimeRoomDeliveryServer = {
+    to(roomName) {
+      const target: RealtimeRoomDeliveryTarget = {
+        emit(eventName, payload) {
+          if (eventName !== REALTIME_EVENTS.studentActivitySnapshot) {
+            throw new Error(`Unexpected event: ${eventName}`);
+          }
+
+          emitted.push({
+            roomName,
+            eventName,
+            payload: payload as StudentActivitySnapshot,
           });
         },
       };
@@ -466,6 +497,90 @@ describe("realtime resume recovery", () => {
           },
         },
       },
+    ]);
+  });
+
+  it("recovers a missed Pairing chat message when a student Realtime Connection resumes", () => {
+    const activityId = "12345" as ActivityId;
+    const pairingId = "pairing-1" as EntityId;
+    const studentSessionId = "student-session-1" as SessionId;
+    const missedMessage = {
+      id: "message-1" as EntityId,
+      senderStudentId: "student-2" as EntityId,
+      senderCharacterName: "Builder",
+      text: "This arrived while the Realtime Connection was down.",
+    };
+    const activity = createActivity({
+      activityId,
+      joinCode: "12345" as JoinCode,
+      studentSnapshotsBySessionId: {
+        [studentSessionId]: {
+          activityId,
+          joinCode: "12345" as JoinCode,
+          studentId: "student-1" as EntityId,
+          studentRealName: "Ada",
+          state: "active_pairing",
+          activePairing: {
+            id: pairingId,
+            ownCharacterName: "Guide",
+            peer: {
+              studentId: "student-2" as EntityId,
+              characterName: "Builder",
+              connectionStatus: "connected",
+            },
+            messages: [missedMessage],
+          },
+        },
+      },
+    });
+    const registry = createRealtimeConnectionRegistry();
+    const socket = createSocket("student-socket-2");
+    const delivery = createStudentDeliveryServer();
+    const disconnectedSocketIds: string[] = [];
+
+    registry.registerSessionSocket(studentSessionId, "student-socket-1");
+
+    const result = sendStudentResumeRecoverySnapshot({
+      activityService: {
+        getActivity: () => activity,
+      },
+      deliveryServer: delivery.server,
+      registry,
+      socketReplacement: {
+        disconnectSocket: (socketId) => {
+          disconnectedSocketIds.push(socketId);
+        },
+      },
+      socket,
+      sessionId: studentSessionId,
+      activityId,
+    });
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        activityId,
+        pairingId,
+        sessionId: studentSessionId,
+      },
+    });
+    expect(registry.getSocketIds(studentSessionId)).toEqual([
+      "student-socket-2",
+    ]);
+    expect(disconnectedSocketIds).toEqual(["student-socket-1"]);
+    expect(socket.joinedRooms).toEqual([
+      "frempower:session:student-session-1",
+      "frempower:pairing:pairing-1",
+    ]);
+    expect(delivery.emitted).toEqual([
+      {
+        roomName: "frempower:session:student-session-1",
+        eventName: REALTIME_EVENTS.studentActivitySnapshot,
+        payload: buildStudentActivitySnapshot(activity, studentSessionId),
+      },
+    ]);
+    expect(delivery.emitted[0]?.payload.activePairing?.messages).toEqual([
+      missedMessage,
     ]);
   });
 
