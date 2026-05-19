@@ -24,23 +24,24 @@ export type RealtimeConnectionRegistry = {
 
 export const createRealtimeConnectionRegistry =
   (): RealtimeConnectionRegistry => {
-    const socketsBySessionId = new Map<SessionId, Set<TransportSocketId>>();
+    const socketIdBySessionId = new Map<SessionId, TransportSocketId>();
     const sessionIdBySocketId = new Map<TransportSocketId, SessionId>();
 
     return {
       registerSessionSocket(sessionId, socketId) {
         const existingSessionId = sessionIdBySocketId.get(socketId);
         if (existingSessionId !== undefined && existingSessionId !== sessionId) {
-          const existingSocketIds = socketsBySessionId.get(existingSessionId);
-          existingSocketIds?.delete(socketId);
-          if (existingSocketIds?.size === 0) {
-            socketsBySessionId.delete(existingSessionId);
+          if (socketIdBySessionId.get(existingSessionId) === socketId) {
+            socketIdBySessionId.delete(existingSessionId);
           }
         }
 
-        const socketIds = socketsBySessionId.get(sessionId) ?? new Set();
-        socketIds.add(socketId);
-        socketsBySessionId.set(sessionId, socketIds);
+        const replacedSocketId = socketIdBySessionId.get(sessionId);
+        if (replacedSocketId !== undefined && replacedSocketId !== socketId) {
+          sessionIdBySocketId.delete(replacedSocketId);
+        }
+
+        socketIdBySessionId.set(sessionId, socketId);
         sessionIdBySocketId.set(socketId, sessionId);
       },
 
@@ -51,34 +52,27 @@ export const createRealtimeConnectionRegistry =
         }
 
         sessionIdBySocketId.delete(socketId);
-
-        const socketIds = socketsBySessionId.get(sessionId);
-        socketIds?.delete(socketId);
-
-        const remainingSocketCount = socketIds?.size ?? 0;
-        const isLastSocketForSession = remainingSocketCount === 0;
-        if (isLastSocketForSession) {
-          socketsBySessionId.delete(sessionId);
-        }
+        socketIdBySessionId.delete(sessionId);
 
         return {
           sessionId,
           socketId,
-          remainingSocketCount,
-          isLastSocketForSession,
+          remainingSocketCount: 0,
+          isLastSocketForSession: true,
         };
       },
 
       isSessionConnected(sessionId) {
-        return (socketsBySessionId.get(sessionId)?.size ?? 0) > 0;
+        return socketIdBySessionId.has(sessionId);
       },
 
       getSocketIds(sessionId) {
-        return [...(socketsBySessionId.get(sessionId) ?? [])];
+        const socketId = socketIdBySessionId.get(sessionId);
+        return socketId === undefined ? [] : [socketId];
       },
 
       getSessionIds() {
-        return [...socketsBySessionId.keys()];
+        return [...socketIdBySessionId.keys()];
       },
     };
   };

@@ -155,7 +155,7 @@ _Avoid_: Authentication, sign-up, account creation
 - A student must provide a valid **Join Code** before providing a **Student Real Name**.
 - If a student provides a **Join Code** with no live **Classroom Activity**, the server rejects the join and does not create a **Chat Participant**.
 - A participant's **Session ID** identifies them across **Realtime Server** reconnects and same-tab page refreshes during the current server process.
-- A **Session ID** is stored in sessionStorage so it is not shared across multiple browser tabs.
+- A **Session ID** is stored in sessionStorage and represents one guest session in one browser tab.
 - The server generates **Session IDs** and returns them to the **Client** during host or join commands when needed.
 - **Session IDs** are random opaque values and are not derived from **Join Codes**, socket IDs, or participant names.
 - Students, pairings, and completed chats use opaque **Entity IDs** for client actions and rendering.
@@ -177,7 +177,7 @@ _Avoid_: Authentication, sign-up, account creation
 - Applied **Character Names** preserve the teacher's chosen casing for display.
 - A **Student** must provide a **Student Real Name** so the teacher can identify them.
 - Duplicate **Student Real Names** are allowed in the same **Classroom Activity**.
-- The same **Student Real Name** can join the same **Classroom Activity** from multiple browser tabs as separate live students.
+- The same **Student Real Name** can be entered by separate guest sessions in the same **Classroom Activity**, but a single guest session is live in only one browser tab.
 - Each student receives an automatically assigned **Character Name** when the teacher creates a **Pairing** in version 1.
 - **Character Names** are scoped to a **Pairing**, not to a student for the whole **Classroom Activity**.
 - Two students in the same **Pairing** cannot have the same **Character Name**.
@@ -253,10 +253,11 @@ _Avoid_: Authentication, sign-up, account creation
 - The activity store or service does not import or directly use Socket.IO.
 - The activity store or service exposes state-change callbacks so the Socket.IO layer can broadcast snapshots.
 - The activity store or service stores **Session IDs** and classroom activity state, not socket IDs as identity.
-- The Socket.IO layer can maintain connection routing details that map **Session IDs** to current socket connections.
-- One **Session ID** can have multiple simultaneous socket connections.
-- A participant is considered connected while at least one socket for their **Session ID** is connected.
-- Disconnect timers start only when the last socket for a **Session ID** disconnects.
+- The Socket.IO layer can maintain connection routing details that map each **Session ID** to its current socket connection.
+- Version 1 allows only one live socket connection per **Session ID** because participants are guest sessions without durable accounts or database-backed multi-device login.
+- If a new socket resumes the same **Session ID** while an older socket is still connected, the new socket replaces the old socket and the old socket is disconnected.
+- A participant is considered connected while the current socket for their **Session ID** is connected.
+- Disconnect timers start when the current socket for a **Session ID** disconnects without being replaced.
 - Reconnecting with a **Session ID** cancels any active disconnect timer for that participant.
 - The **Realtime Server** uses Socket.IO heartbeat/ping-pong settings to detect dead connections; TCP keepalive is not sufficient for classroom reconnect behavior.
 - The **Realtime Server** scopes delivery with Socket.IO rooms for **Session IDs**, teacher activity updates, student snapshots, and active **Pairings**.

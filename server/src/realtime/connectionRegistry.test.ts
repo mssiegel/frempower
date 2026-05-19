@@ -23,7 +23,7 @@ describe("realtime connection registry", () => {
     ]);
   });
 
-  it("allows one Session ID to have multiple simultaneous transport sockets", () => {
+  it("enforces one live transport socket per Session ID", () => {
     const registry = createRealtimeConnectionRegistry();
     const teacherSessionId = "teacher-session-1" as SessionId;
 
@@ -31,10 +31,11 @@ describe("realtime connection registry", () => {
     registry.registerSessionSocket(teacherSessionId, "teacher-socket-2");
 
     expect(registry.getSocketIds(teacherSessionId)).toEqual([
-      "teacher-socket-1",
       "teacher-socket-2",
     ]);
     expect(registry.getSessionIds()).toEqual([teacherSessionId]);
+    expect(registry.unregisterSocket("teacher-socket-1")).toBeUndefined();
+    expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
   });
 
   it("considers a Session ID connected while it has at least one registered transport socket", () => {
@@ -45,7 +46,6 @@ describe("realtime connection registry", () => {
     expect(registry.isSessionConnected(teacherSessionId)).toBe(false);
 
     registry.registerSessionSocket(teacherSessionId, "teacher-socket-1");
-    registry.registerSessionSocket(teacherSessionId, "teacher-socket-2");
 
     expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
     expect(registry.isSessionConnected(unknownSessionId)).toBe(false);
@@ -56,24 +56,12 @@ describe("realtime connection registry", () => {
     const teacherSessionId = "teacher-session-1" as SessionId;
 
     registry.registerSessionSocket(teacherSessionId, "teacher-socket-1");
-    registry.registerSessionSocket(teacherSessionId, "teacher-socket-2");
 
     expect(registry.unregisterSocket("unknown-socket")).toBeUndefined();
 
     expect(registry.unregisterSocket("teacher-socket-1")).toEqual({
       sessionId: teacherSessionId,
       socketId: "teacher-socket-1",
-      remainingSocketCount: 1,
-      isLastSocketForSession: false,
-    });
-    expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
-    expect(registry.getSocketIds(teacherSessionId)).toEqual([
-      "teacher-socket-2",
-    ]);
-
-    expect(registry.unregisterSocket("teacher-socket-2")).toEqual({
-      sessionId: teacherSessionId,
-      socketId: "teacher-socket-2",
       remainingSocketCount: 0,
       isLastSocketForSession: true,
     });

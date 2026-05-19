@@ -147,7 +147,7 @@ _Avoid_: WebSocket, polling stream
 - All students in the lobby are ready to chat in version 1.
 - If a student enters a **Join Code** with no live **Classroom Activity**, the join flow shows an inline error and does not create a **Chat Participant**.
 - A participant's **Session ID** identifies them across **Realtime Connection** reconnects and same-tab page refreshes during the current server process.
-- A **Session ID** is stored in sessionStorage so it is not shared across multiple browser tabs.
+- A **Session ID** is stored in sessionStorage and represents one guest session in one browser tab.
 - Teacher and student **Session IDs** use separate sessionStorage keys.
 - The server generates **Session IDs** and returns them to the **Client** during host or join commands when needed.
 - **Session IDs** are random opaque values and are not derived from **Join Codes**, socket IDs, or participant names.
@@ -184,7 +184,7 @@ _Avoid_: WebSocket, polling stream
 - The student-facing label for **Student Real Name** is "Your name".
 - Duplicate **Student Real Names** are allowed in the same **Classroom Activity**.
 - The **Teacher Page** can show a visual cue when multiple live students have the same **Student Real Name**.
-- The same **Student Real Name** can join the same **Classroom Activity** from multiple browser tabs as separate live students.
+- The same **Student Real Name** can be entered by separate guest sessions in the same **Classroom Activity**, but a single guest session is live in only one browser tab.
 - Each student receives an automatically assigned **Character Name** when the teacher creates a **Pairing** in version 1.
 - **Character Names** are scoped to a **Pairing**, not to a student for the whole **Classroom Activity**.
 - Two students in the same **Pairing** cannot have the same **Character Name**.
