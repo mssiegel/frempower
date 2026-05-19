@@ -1,62 +1,63 @@
-# Current Codebase Socket.IO Implementation PRD
+# Teacher Host Form Setup Flow PRD
 
-Goal: Update the current Frempower Realtime Server and Realtime Connection implementation to follow the Socket.IO best practices captured in `docs/current-codebase-socketio-implementation-plan.md`.
+Goal: Implement the V1 `/teacher` host form setup flow so a teacher can prepare the **Character List**, choose quiet optional settings, and see when **Host activity** is ready. This PRD is scoped to the local form boundary for `local/issues/issue-4-001-build-teacher-host-form-setup-flow.md`; creating a **Classroom Activity** comes later.
 
-This PRD is intentionally scoped to the current codebase implementation. It is not a replacement for the GitHub V1 product issues. `ralph-once.sh` should use the local issue files under `local/issues/` and tackle them in numeric order.
+## Source Issue
 
-## Source Plan
+- `local/issues/issue-4-001-build-teacher-host-form-setup-flow.md`
+- GitHub parent: https://github.com/mssiegel/frempower/issues/4
 
-- `docs/current-codebase-socketio-implementation-plan.md`
+## Product Scope
 
-## Known decisions
+- `/teacher` shows the teacher host form on desktop widths.
+- Small screens show a clear unsupported-width state.
+- The form is a compact single-column sequence: **Characters**, optional settings, then **Host activity**.
+- The sequence may use numbered steps for rhythm, but it is not a wizard.
+- **Characters** starts with `Character 1`, `Character 2`, and `Character 3`.
+- Teachers can add and remove **Character Name** rows.
+- **Host activity** remains disabled until the default **Character List** has been updated and at least two distinct non-empty **Character Names** exist.
+- Duplicate **Character Name** validation trims whitespace and compares case-insensitively while preserving display casing.
+- Readiness status stays local to the **Characters** validation message and **Host activity** blocker or ready copy.
+- Optional **Teacher Email** is visible but quiet.
+- **Peer Real Name Visibility** defaults off and uses teacher-facing action copy such as "Show students their partner's real name".
 
-- Use Socket.IO heartbeat/ping-pong settings to detect dead realtime connections.
-- Do not rely on TCP keepalive as the authority for **Teacher Disconnect** or **Student Disconnect** behavior.
-- Use Socket.IO rooms for **Session ID**, teacher activity, student snapshot, and active **Pairing** delivery.
-- Enforce only one live Realtime Connection per **Session ID**.
-- Treat a **Session ID** as one guest session in one browser tab; Version 1 has no database-backed multi-tab or multi-device login.
-- If a new socket resumes the same **Session ID**, the new socket replaces the old socket.
-- Do not broadcast globally and filter by activity, student, or pairing in application logic.
-- Keep authoritative activity and chat state in the activity service.
-- Recover missed authoritative state through audience-specific snapshots after reconnect.
-- Keep typing indicators ephemeral.
-- Keep server activity/domain logic separate from Socket.IO handlers.
-- Keep Ralph human-in-the-loop. `ralph-once.sh` runs one local issue criterion at a time and leaves diffs for software engineering author review.
+## Out Of Scope
+
+- Creating a **Classroom Activity**.
+- Generating or displaying a **Join Code**.
+- Hosting over the **Realtime Connection**.
+- Hosted teacher activity routes.
+- Student join, lobby, pairing, chat, settings, or **End Activity** flows.
+- Teacher name fields.
+- Student-experience previews.
+- Reset-to-defaults actions.
+- Pre-host draft persistence.
+- Authentication, database, Docker, Docker Compose, dev containers, or container-specific scripts.
 
 ## Local Issue Backlog
 
-- [x] `local/issues/001-configure-realtime-heartbeat-baseline.md`
-- [x] `local/issues/002-add-session-room-routing-foundation.md`
-- [x] `local/issues/003-emit-realtime-updates-through-rooms.md`
-- [x] `local/issues/004-recover-authoritative-state-after-reconnect.md`
-- [x] `local/issues/005-add-realtime-boundary-regression-tests.md`
+- [ ] `local/issues/issue-4-001-build-teacher-host-form-setup-flow.md`
+- [ ] `local/issues/issue-4-002-create-classroom-activity-from-teacher-host-command.md`
+- [ ] `local/issues/issue-4-003-show-hosted-teacher-page-join-code-surface.md`
+- [ ] `local/issues/issue-4-004-resume-and-protect-teacher-activity-routes.md`
+- [ ] `local/issues/issue-4-005-route-teacher-realtime-delivery-through-session-and-activity-rooms.md`
+- [ ] `local/issues/issue-4-006-connect-homepage-teacher-and-student-ctas.md`
 
-Current Ralph status: `local/issues/004-recover-authoritative-state-after-reconnect.md` is complete. Next iteration should start `local/issues/005-add-realtime-boundary-regression-tests.md`.
+Current Ralph status: start `local/issues/issue-4-001-build-teacher-host-form-setup-flow.md`.
 
 ## Ralph Workflow
 
-1. Run `./ralph-once.sh`.
-2. The script selects the lowest-numbered local issue with unchecked acceptance criteria.
-3. Ralph implements exactly one unchecked acceptance criterion from that issue.
-4. Ralph marks that criterion complete in the local issue only after verification passes, or records the blocker in `progress.txt`.
-5. When a local issue has no remaining unchecked acceptance criteria, Ralph marks the matching backlog item complete in this PRD.
+1. Run `./afk-ralph.sh`.
+2. The script targets `local/issues/issue-4-001-build-teacher-host-form-setup-flow.md` by default.
+3. Ralph implements exactly one unchecked acceptance criterion from that local issue.
+4. Ralph marks that criterion complete in the local issue only after relevant verification passes, or records the blocker in `progress.txt`.
+5. When the local issue has no remaining unchecked acceptance criteria, Ralph marks the matching backlog item complete in this PRD.
 6. Ralph updates `progress.txt` every iteration.
-7. Ralph does not commit, push, merge, close GitHub issues, or modify GitHub issues.
-
-## Constraints
-
-- Do not add authentication.
-- Do not add a database.
-- Do not add Docker, Docker Compose, dev containers, or container-specific scripts.
-- Do not implement unrelated host, join, pairing, or chat product flows.
-- Do not use socket IDs as participant identity.
-- Do not support multiple live browser tabs for one guest session in Version 1.
-- Prefer small, reviewable diffs.
-- Run the most relevant feedback loop before marking a criterion complete.
-- Leave Ralph iteration diffs uncommitted for software engineering author review.
+7. Ralph commits each successful iteration on `main`; do not push, merge, close GitHub issues, or modify GitHub issues.
 
 ## Verification
 
-- Run focused tests or type checks for the criterion Ralph completes.
-- Before a Ralph criterion is marked complete, update the local issue file and `progress.txt`.
-- Do not declare a local issue complete in this PRD until all acceptance criteria in that local issue are checked.
+- Prefer focused client tests for host form validation and disabled/enabled **Host activity** behavior.
+- Run the smallest relevant command for the selected criterion, such as `npm run test -w client`, before checking off a criterion.
+- Run formatting on touched client, Markdown, and script files when practical.
+- Do not declare the local issue complete in this PRD until all acceptance criteria in the local issue are checked.

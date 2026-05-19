@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ISSUE_PATH="${RALPH_ISSUE_PATH:-local/issues/005-add-realtime-boundary-regression-tests.md}"
+ISSUE_PATH="${RALPH_ISSUE_PATH:-local/issues/issue-4-001-build-teacher-host-form-setup-flow.md}"
 MAX_ITERATIONS="${1:-}"
 COMPLETION_SIGIL="<promise>COMPLETE</promise>"
 
@@ -87,7 +87,6 @@ Read these files first:
 - server/CONTEXT.md
 - docs/adr/0001-client-server-v1-stack.md
 - docs/adr/0002-realtime-session-contracts.md
-- docs/current-codebase-socketio-implementation-plan.md
 - PRD.md
 - progress.txt
 - $ISSUE_PATH
@@ -108,8 +107,8 @@ Rules:
 5. Keep changes small and focused: one logical change per iteration.
 6. If the selected criterion is blocked, do not mark it complete. Update progress.txt with the blocker and stop.
 7. Use the existing root npm workspace with client, server, and shared packages.
-8. Keep server activity/domain logic separate from Socket.IO handlers.
-9. Do not implement unrelated host, join, pairing, chat, settings, or End Activity product flows unless the selected criterion directly requires a small supporting slice.
+8. For this issue, stay at the local `/teacher` host form boundary: render the form, validate it locally, and control the disabled/enabled **Host activity** state.
+9. Do not create a **Classroom Activity**, generate a **Join Code**, wire host commands to the **Realtime Connection**, or implement hosted teacher/student routes unless the selected criterion directly requires a tiny local UI support slice.
 10. Do not add authentication.
 11. Do not add a database.
 12. Do not add Docker, Docker Compose, dev containers, or container-specific scripts.
@@ -123,10 +122,12 @@ Rules:
 20. Do not push to GitHub, merge branches, close GitHub issues, or modify GitHub issues.
 
 Quality bar:
-- Production-oriented TypeScript.
+- Production-oriented TypeScript and React.
 - Use domain language from client/CONTEXT.md and server/CONTEXT.md.
-- Prefer plain runtime helpers over adding schema validation libraries.
-- Prefer deterministic tests for connection, routing, clock, random, and Join Code behavior.
+- Prefer small local helpers for **Character Name** validation over adding schema validation libraries.
+- Keep `/teacher` copy calm, teacher-facing, and consistent with the issue.
+- Keep the host form desktop-focused and provide a clear unsupported-width state for small screens.
+- Add or update focused client tests for the selected host form behavior.
 - Fight entropy. Leave the codebase better than you found it.
 
 If all acceptance criteria are already complete, output $COMPLETION_SIGIL.

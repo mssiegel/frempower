@@ -1,83 +1,42 @@
-Current Codebase Socket.IO implementation progress
+Teacher host form setup flow progress
 
 Current mode:
-- Ralph remains human-in-the-loop.
-- `ralph-once.sh` works through local issue files under `local/issues/` in numeric order.
+- AFK Ralph targets the local issue for the `/teacher` host form setup flow.
 - Each Ralph iteration implements exactly one unchecked acceptance criterion from the selected local issue.
-- Iteration diffs are left uncommitted for software engineering author review.
+- `afk-ralph.sh` commits each successful iteration on `main`.
+- Ralph must still update the local issue, `PRD.md`, and this file before it stops.
 
 Current local issue:
-- `local/issues/005-add-realtime-boundary-regression-tests.md` is complete.
+- `local/issues/issue-4-001-build-teacher-host-form-setup-flow.md`
 
 Completed local issues:
-- `local/issues/001-configure-realtime-heartbeat-baseline.md`
-- `local/issues/002-add-session-room-routing-foundation.md`
-- `local/issues/003-emit-realtime-updates-through-rooms.md`
-- `local/issues/004-recover-authoritative-state-after-reconnect.md`
-- `local/issues/005-add-realtime-boundary-regression-tests.md`
+- None for GitHub parent issue #4 yet.
 
 Completed criteria:
-- `local/issues/001-configure-realtime-heartbeat-baseline.md`: The Realtime Server configures explicit Socket.IO `pingInterval` and `pingTimeout` values.
-- `local/issues/001-configure-realtime-heartbeat-baseline.md`: The chosen heartbeat values are shorter than the existing domain reconnect grace periods.
-- `local/issues/001-configure-realtime-heartbeat-baseline.md`: Server disconnect logging or instrumentation clearly treats Socket.IO disconnect as the transport-level signal for future **Teacher Disconnect** and **Student Disconnect** behavior.
-- `local/issues/001-configure-realtime-heartbeat-baseline.md`: The Client connection hook reflects connected and disconnected states from Socket.IO events.
-- `local/issues/001-configure-realtime-heartbeat-baseline.md`: Tests or a small verification path cover connection and disconnect state changes.
-- `local/issues/002-add-session-room-routing-foundation.md`: The Realtime Server has a connection registry that tracks `Session ID -> current socket ID`.
-- `local/issues/002-add-session-room-routing-foundation.md`: The registry enforces only one live socket connection per **Session ID**.
-- `local/issues/002-add-session-room-routing-foundation.md`: If a new socket resumes the same **Session ID**, the registry replaces the old socket with the new current socket.
-- `local/issues/002-add-session-room-routing-foundation.md`: A participant is considered connected while the current socket remains registered for the **Session ID**.
-- `local/issues/002-add-session-room-routing-foundation.md`: The registry removes the current socket on disconnect and reports when the **Session ID** has no current socket.
-- `local/issues/002-add-session-room-routing-foundation.md`: Server-private room naming helpers exist for **Session ID** rooms, teacher activity rooms, and active **Pairing** rooms.
-- `local/issues/002-add-session-room-routing-foundation.md`: Tests cover single-live-socket replacement, current-socket disconnect, and room name stability.
-- `local/issues/003-emit-realtime-updates-through-rooms.md`: The Realtime Server exposes or uses helpers for emitting to the teacher activity room.
-- `local/issues/003-emit-realtime-updates-through-rooms.md`: The Realtime Server exposes or uses helpers for emitting to the current socket in a student **Session ID** room.
-- `local/issues/003-emit-realtime-updates-through-rooms.md`: The Realtime Server exposes or uses helpers for emitting to an active **Pairing** room.
-- `local/issues/003-emit-realtime-updates-through-rooms.md`: Room delivery assumes only one live socket per **Session ID**.
-- `local/issues/003-emit-realtime-updates-through-rooms.md`: Tests prove that a message targeted to one room is not delivered to sockets outside that room.
-- `local/issues/003-emit-realtime-updates-through-rooms.md`: No new realtime path uses global broadcast plus application-side filtering for teacher, student, or pairing audiences.
-- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Resume handling sends a fresh teacher or student snapshot for the reconnecting **Session ID** when authoritative state exists.
-- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Resume handling treats the newest socket for a **Session ID** as current and disconnects any older socket for that **Session ID**.
-- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Missed removed, activity-ended, pairing-ended, and chat state are represented as snapshot state rather than transient-only notifications.
-- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Chat messages are stored in in-memory pairing state before realtime delivery.
-- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Typing indicators remain ephemeral and are allowed to expire during disconnects.
-- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Tests cover reconnecting after a missed state change and receiving the current snapshot on the newest socket.
-- `local/issues/004-recover-authoritative-state-after-reconnect.md`: The Socket.IO layer does not make socket IDs participant identity.
-- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover explicit heartbeat configuration.
-- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover one **Session ID** allowing only one live socket.
-- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover a newer socket replacing an older socket for the same **Session ID**.
-- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover current-socket disconnect behavior.
-- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover rejoining rooms after reconnect or resume.
-- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover room-scoped delivery isolation for teacher, student, and pairing audiences.
-- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover missed snapshot or chat recovery after reconnect.
-- `local/issues/005-add-realtime-boundary-regression-tests.md`: Test names use repo domain language such as **Realtime Server**, **Realtime Connection**, **Session ID**, **Classroom Activity**, and **Pairing**.
+- None yet for `local/issues/issue-4-001-build-teacher-host-form-setup-flow.md`.
 
 Changed:
-- Renamed realtime boundary regression test descriptions to use repo domain language: **Realtime Server**, **Realtime Connection**, **Session ID**, **Classroom Activity**, and **Pairing**.
-- Marked the final acceptance criterion complete in `local/issues/005-add-realtime-boundary-regression-tests.md`.
-- Marked the matching PRD backlog item complete because all criteria in the local issue are now complete.
+- Retargeted Ralph planning from the completed Socket.IO backlog to the `/teacher` host form setup flow.
+- Set `afk-ralph.sh` to default to `local/issues/issue-4-001-build-teacher-host-form-setup-flow.md`.
+- Rewrote `PRD.md` around the teacher host form scope, out-of-scope boundaries, backlog, workflow, and verification.
+- Reset this progress log for issue 4-001.
 
 Key decisions:
-- Selected the only unchecked criterion: test names use repo domain language.
-- Kept the slice to test description strings only; no production behavior changed.
+- Keep issue 4-001 at the local client form boundary.
+- Do not create a **Classroom Activity**, generate a **Join Code**, or wire host commands in this issue.
+- Prefer focused client tests for validation and disabled/enabled **Host activity** behavior.
+- Preserve repo domain language: **Teacher Page**, **Characters**, **Character Name**, **Character List**, **Teacher Email**, **Peer Real Name Visibility**, **Host activity**, and **Classroom Activity**.
 
 Blockers:
-- None.
+- Parent issue #3 is listed as a blocker in the local issue. Ralph should inspect the current codebase before selecting a criterion; if the selected criterion is genuinely blocked by missing parent-issue work, record the blocker and stop without checking it off.
 
 Files changed:
-- `server/src/realtime/chatMessageDelivery.test.ts`
-- `server/src/realtime/connectionRegistry.test.ts`
-- `server/src/realtime/disconnectSignal.test.ts`
-- `server/src/realtime/heartbeat.test.ts`
-- `server/src/realtime/resumeRecovery.test.ts`
-- `server/src/realtime/roomDelivery.test.ts`
-- `server/src/realtime/roomNames.test.ts`
-- `local/issues/005-add-realtime-boundary-regression-tests.md`
+- `afk-ralph.sh`
 - `PRD.md`
 - `progress.txt`
 
 Verification:
-- Ran: `npx prettier --write` on changed TypeScript and Markdown files. Prettier formatted those files and reported no parser for `progress.txt`, which was left as plain text.
-- Passed: `npm run test -w server`
+- Pending after this retargeting update.
 
 Recommended next iteration:
-- No unchecked acceptance criteria remain in `local/issues/005-add-realtime-boundary-regression-tests.md`; the local Socket.IO implementation PRD backlog is complete.
+- Start the topmost unchecked criterion in `local/issues/issue-4-001-build-teacher-host-form-setup-flow.md`: `/teacher` shows a desktop-only host form and a clear unsupported-width state on small screens.
