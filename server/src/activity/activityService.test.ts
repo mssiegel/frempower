@@ -1,6 +1,11 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import type { JoinCode } from "@frempower/shared";
+import type {
+  ActivityId,
+  EntityId,
+  JoinCode,
+  SessionId,
+} from "@frempower/shared";
 import {
   createActivityServiceDependencies,
   createInMemoryActivityService,
@@ -11,7 +16,7 @@ describe("activity service architecture", () => {
   it("does not import Socket.IO transport concerns", () => {
     const source = readFileSync(
       new URL("./activityService.ts", import.meta.url),
-      "utf8",
+      "utf8"
     );
 
     expect(source).not.toMatch(/from\s+["']socket\.io["']/);
@@ -54,5 +59,79 @@ describe("activity service dependencies", () => {
     const reservedJoinCodes = new Set<JoinCode>(["10000" as JoinCode]);
 
     expect(generator(reservedJoinCodes)).toBe("55000");
+  });
+});
+
+describe("activity service chat messages", () => {
+  it("stores chat messages in authoritative active Pairing and student snapshot state", () => {
+    const service = createInMemoryActivityService();
+    const activityId = "12345" as ActivityId;
+    const pairingId = "pairing-1" as EntityId;
+    const message = {
+      id: "message-1" as EntityId,
+      senderStudentId: "student-1" as EntityId,
+      senderCharacterName: "Character 1",
+      text: "Hello there",
+    };
+
+    service.createActivity({
+      activityId,
+      joinCode: "12345",
+      teacherSessionId: "teacher-session-1" as SessionId,
+      characterNames: ["Character 1", "Character 2"],
+      peerRealNameVisibility: false,
+      status: "live",
+      activePairings: [
+        {
+          id: pairingId,
+          participants: [
+            {
+              studentId: "student-1" as EntityId,
+              studentRealName: "Ada",
+              characterName: "Character 1",
+              connectionStatus: "connected",
+            },
+            {
+              studentId: "student-2" as EntityId,
+              studentRealName: "Grace",
+              characterName: "Character 2",
+              connectionStatus: "connected",
+            },
+          ],
+          recentMessages: [],
+        },
+      ],
+      studentSnapshotsBySessionId: {
+        ["student-session-1" as SessionId]: {
+          activityId,
+          joinCode: "12345",
+          studentId: "student-1" as EntityId,
+          studentRealName: "Ada",
+          state: "active_pairing",
+          activePairing: {
+            id: pairingId,
+            ownCharacterName: "Character 1",
+            peer: {
+              studentId: "student-2" as EntityId,
+              characterName: "Character 2",
+              connectionStatus: "connected",
+            },
+            messages: [],
+          },
+        },
+      },
+    });
+
+    const result = service.recordChatMessage(activityId, pairingId, message);
+
+    expect(result.ok).toBe(true);
+    expect(
+      service.getActivity(activityId)?.activePairings?.[0]?.recentMessages
+    ).toEqual([message]);
+    expect(
+      service.getActivity(activityId)?.studentSnapshotsBySessionId?.[
+        "student-session-1" as SessionId
+      ]?.activePairing?.messages
+    ).toEqual([message]);
   });
 });

@@ -1,7 +1,9 @@
 import type {
   ActivityId,
   CharacterName,
+  ChatMessageSnapshot,
   CompletedChatSnapshot,
+  EntityId,
   JoinCode,
   SessionId,
   StudentActivitySnapshot,
@@ -43,10 +45,16 @@ export type ActivityServiceSubscriber = (change: ActivityServiceChange) => void;
 
 export type ActivityService = {
   subscribe(subscriber: ActivityServiceSubscriber): () => void;
+  createActivity(activity: ClassroomActivityRecord): void;
   reserveJoinCode(): JoinCode;
   releaseJoinCode(joinCode: JoinCode): void;
   getActivity(activityId: ActivityId): ClassroomActivityRecord | undefined;
   listActivities(): ClassroomActivityRecord[];
+  recordChatMessage(
+    activityId: ActivityId,
+    pairingId: EntityId,
+    message: ChatMessageSnapshot
+  ): RecordChatMessageResult;
 };
 
 export type ActivityServiceClock = {
@@ -70,6 +78,16 @@ export type ActivityServiceDependencies = {
 export type CreateInMemoryActivityServiceOptions = {
   dependencies?: Partial<ActivityServiceDependencies>;
 };
+
+export type RecordChatMessageResult =
+  | {
+      ok: true;
+      activity: ClassroomActivityRecord;
+    }
+  | {
+      ok: false;
+      reason: "activity_not_found" | "activity_not_live" | "pairing_not_found";
+    };
 
 const createDefaultClock = (): ActivityServiceClock => ({
   now: () => new Date(),
@@ -121,6 +139,12 @@ export const createInMemoryActivityService = (
   const activities = new Map<ActivityId, ClassroomActivityRecord>();
   const reservedJoinCodes = new Set<JoinCode>();
   const subscribers = new Set<ActivityServiceSubscriber>();
+
+  const notifySubscribers = (change: ActivityServiceChange) => {
+    for (const subscriber of subscribers) {
+      subscriber(change);
+    }
+  };
 
   const cloneStudentSnapshot = (
     snapshot: StudentActivitySnapshot
@@ -194,6 +218,15 @@ export const createInMemoryActivityService = (
       return joinCode;
     },
 
+    createActivity(activity) {
+      activities.set(activity.activityId, cloneActivity(activity));
+      reservedJoinCodes.add(activity.joinCode);
+      notifySubscribers({
+        activityId: activity.activityId,
+        reason: "activity_created",
+      });
+    },
+
     releaseJoinCode(joinCode) {
       reservedJoinCodes.delete(joinCode);
     },
@@ -206,6 +239,50 @@ export const createInMemoryActivityService = (
 
     listActivities() {
       return [...activities.values()].map(cloneActivity);
+    },
+
+    recordChatMessage(activityId, pairingId, message) {
+      const activity = activities.get(activityId);
+
+      if (activity === undefined) {
+        return { ok: false, reason: "activity_not_found" };
+      }
+
+      if (activity.status !== "live") {
+        return { ok: false, reason: "activity_not_live" };
+      }
+
+      const activePairing = activity.activePairings?.find(
+        (pairing) => pairing.id === pairingId
+      );
+
+      if (activePairing === undefined) {
+        return { ok: false, reason: "pairing_not_found" };
+      }
+
+      activePairing.recentMessages = [
+        ...activePairing.recentMessages,
+        { ...message },
+      ];
+
+      if (activity.studentSnapshotsBySessionId !== undefined) {
+        for (const snapshot of Object.values(
+          activity.studentSnapshotsBySessionId
+        )) {
+          if (snapshot?.activePairing?.id !== pairingId) {
+            continue;
+          }
+
+          snapshot.activePairing.messages = [
+            ...snapshot.activePairing.messages,
+            { ...message },
+          ];
+        }
+      }
+
+      notifySubscribers({ activityId, reason: "activity_updated" });
+
+      return { ok: true, activity: cloneActivity(activity) };
     },
   };
 };
