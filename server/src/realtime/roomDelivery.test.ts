@@ -8,6 +8,7 @@ import type {
 } from "@frempower/shared";
 import { REALTIME_EVENTS } from "@frempower/shared";
 import { describe, expect, it } from "vitest";
+import { createRealtimeConnectionRegistry } from "./connectionRegistry.js";
 import {
   emitChatMessageToPairingRoom,
   emitStudentActivitySnapshotToSessionRoom,
@@ -68,6 +69,8 @@ describe("realtime room delivery", () => {
 
   it("emits student activity snapshots to the student Session ID room", () => {
     const sessionId = "student-session-1" as SessionId;
+    const registry = createRealtimeConnectionRegistry();
+    registry.registerSessionSocket(sessionId, "student-socket-1");
     const emitted: Array<{
       eventName: typeof REALTIME_EVENTS.studentActivitySnapshot;
       payload: StudentActivitySnapshot;
@@ -96,7 +99,14 @@ describe("realtime room delivery", () => {
       state: "lobby",
     };
 
-    emitStudentActivitySnapshotToSessionRoom(server, sessionId, snapshot);
+    expect(
+      emitStudentActivitySnapshotToSessionRoom(
+        server,
+        registry,
+        sessionId,
+        snapshot,
+      ),
+    ).toBe(true);
 
     expect(roomNames).toEqual(["frempower:session:student-session-1"]);
     expect(emitted).toEqual([
@@ -105,6 +115,57 @@ describe("realtime room delivery", () => {
         payload: snapshot,
       },
     ]);
+  });
+
+  it("does not emit student activity snapshots without exactly one current socket for the Session ID", () => {
+    const sessionId = "student-session-1" as SessionId;
+    const emitted: Array<{
+      eventName: typeof REALTIME_EVENTS.studentActivitySnapshot;
+      payload: StudentActivitySnapshot;
+    }> = [];
+    const roomNames: string[] = [];
+    const target: RealtimeRoomDeliveryTarget = {
+      emit(eventName, payload) {
+        emitted.push({
+          eventName: eventName as typeof REALTIME_EVENTS.studentActivitySnapshot,
+          payload: payload as StudentActivitySnapshot,
+        });
+      },
+    };
+    const server: RealtimeRoomDeliveryServer = {
+      to(roomName) {
+        roomNames.push(roomName);
+
+        return target;
+      },
+    };
+    const snapshot: StudentActivitySnapshot = {
+      activityId: "12345",
+      joinCode: "12345",
+      studentId: "student-1",
+      studentRealName: "Ada",
+      state: "lobby",
+    };
+
+    expect(
+      emitStudentActivitySnapshotToSessionRoom(
+        server,
+        { getSocketIds: () => [] },
+        sessionId,
+        snapshot,
+      ),
+    ).toBe(false);
+    expect(
+      emitStudentActivitySnapshotToSessionRoom(
+        server,
+        { getSocketIds: () => ["student-socket-1", "student-socket-2"] },
+        sessionId,
+        snapshot,
+      ),
+    ).toBe(false);
+
+    expect(roomNames).toEqual([]);
+    expect(emitted).toEqual([]);
   });
 
   it("emits chat messages to the active Pairing room", () => {

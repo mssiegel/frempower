@@ -12,6 +12,7 @@ import {
   getSessionRoomName,
   getTeacherActivityRoomName,
 } from "./roomNames.js";
+import type { RealtimeConnectionRegistry } from "./connectionRegistry.js";
 
 export type RealtimeRoomDeliveryTarget = {
   emit(
@@ -32,6 +33,11 @@ export type RealtimeRoomDeliveryServer = {
   to(roomName: string): RealtimeRoomDeliveryTarget;
 };
 
+export type RealtimeRoomDeliverySessionRegistry = Pick<
+  RealtimeConnectionRegistry,
+  "getSocketIds"
+>;
+
 export const emitTeacherActivitySnapshotToRoom = (
   server: RealtimeRoomDeliveryServer,
   activityId: ActivityId,
@@ -44,12 +50,20 @@ export const emitTeacherActivitySnapshotToRoom = (
 
 export const emitStudentActivitySnapshotToSessionRoom = (
   server: RealtimeRoomDeliveryServer,
+  registry: RealtimeRoomDeliverySessionRegistry,
   sessionId: SessionId,
   snapshot: StudentActivitySnapshot,
-): void => {
+): boolean => {
+  const currentSocketIds = registry.getSocketIds(sessionId);
+  if (currentSocketIds.length !== 1) {
+    return false;
+  }
+
   server
     .to(getSessionRoomName(sessionId))
     .emit(REALTIME_EVENTS.studentActivitySnapshot, snapshot);
+
+  return true;
 };
 
 export const emitChatMessageToPairingRoom = (
