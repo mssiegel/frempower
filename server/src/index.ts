@@ -2,12 +2,9 @@ import express from "express";
 import { createServer } from "node:http";
 import { Server as SocketIOServer } from "socket.io";
 import { createInMemoryActivityService } from "./activity/activityService.js";
+import { realtimeHeartbeat } from "./realtime/heartbeat.js";
 
 const port = Number(process.env.PORT ?? 3001);
-const realtimeHeartbeat = {
-  pingInterval: 5000,
-  pingTimeout: 5000,
-} as const;
 
 const app = express();
 const httpServer = createServer(app);
