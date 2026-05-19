@@ -330,6 +330,9 @@ _Avoid_: WebSocket, polling stream
 - Version 1 receives full activity snapshots rather than patch events.
 - Version 1 uses audience-specific activity snapshots for teachers and students.
 - Student snapshots do not include the **Student List** or unrelated **Pairings**.
+- The **Client** treats snapshots as the recovery source after reconnects; missed activity, removed, pairing-ended, and chat state should be recovered from the latest audience-specific snapshot.
+- Chat messages missed during a brief **Realtime Connection** loss are recovered through the student's next snapshot.
+- Typing indicators are ephemeral and may expire during a **Realtime Connection** loss.
 - Realtime event names use actor or domain namespaces such as `teacher:*`, `student:*`, and `chat:*`.
 - Snapshot events are audience-specific, such as `teacher:activitySnapshot` and `student:activitySnapshot`.
 - The **Client** sends **Session ID** through Socket.IO auth on connection.

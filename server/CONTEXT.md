@@ -258,6 +258,10 @@ _Avoid_: Authentication, sign-up, account creation
 - A participant is considered connected while at least one socket for their **Session ID** is connected.
 - Disconnect timers start only when the last socket for a **Session ID** disconnects.
 - Reconnecting with a **Session ID** cancels any active disconnect timer for that participant.
+- The **Realtime Server** uses Socket.IO heartbeat/ping-pong settings to detect dead connections; TCP keepalive is not sufficient for classroom reconnect behavior.
+- The **Realtime Server** scopes delivery with Socket.IO rooms for **Session IDs**, teacher activity updates, student snapshots, and active **Pairings**.
+- Chat messages are recorded in in-memory pairing state before realtime delivery so reconnecting students can recover missed messages from snapshots.
+- During reconnect windows, missed removed, ended, pairing-ended, and chat state must be recoverable from authoritative snapshots.
 - Snapshots include server-computed disconnect deadline timestamps when the **Client** needs to render a countdown.
 - The server does not broadcast every second only to update countdown displays.
 - Timeout state changes are authoritative only when the server timer fires and broadcasts updated snapshots.
