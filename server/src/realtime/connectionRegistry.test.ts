@@ -43,7 +43,7 @@ describe("realtime connection registry", () => {
     expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
   });
 
-  it("reports the replaced transport socket when a Session ID resumes on a new socket", () => {
+  it("replaces an older Realtime Connection when the same Session ID resumes on a newer socket", () => {
     const registry = createRealtimeConnectionRegistry();
     const teacherSessionId = "teacher-session-1" as SessionId;
 
