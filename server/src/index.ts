@@ -4,10 +4,14 @@ import { Server as SocketIOServer } from "socket.io";
 import { createInMemoryActivityService } from "./activity/activityService.js";
 
 const port = Number(process.env.PORT ?? 3001);
+const realtimeHeartbeat = {
+  pingInterval: 5000,
+  pingTimeout: 5000,
+} as const;
 
 const app = express();
 const httpServer = createServer(app);
-const io = new SocketIOServer(httpServer);
+const io = new SocketIOServer(httpServer, realtimeHeartbeat);
 const activityService = createInMemoryActivityService();
 
 app.get("/health", (_request, response) => {
@@ -26,4 +30,4 @@ httpServer.listen(port, () => {
   console.log(`Frempower server listening on port ${port}`);
 });
 
-export { activityService, app, httpServer, io };
+export { activityService, app, httpServer, io, realtimeHeartbeat };
