@@ -22,7 +22,12 @@ io.on("connection", (socket) => {
   console.log(`Realtime Connection connected: ${socket.id}`);
 
   socket.on("disconnect", (reason) => {
+    const disconnectedSocket =
+      realtimeConnectionRegistry.unregisterSocket(socket.id);
     console.info(createRealtimeTransportDisconnectSignal(socket.id, reason));
+    if (disconnectedSocket?.isLastSocketForSession === true) {
+      console.info("Last Realtime Connection disconnected for a Session ID.");
+    }
   });
 });
 

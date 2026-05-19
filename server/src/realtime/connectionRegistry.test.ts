@@ -50,4 +50,35 @@ describe("realtime connection registry", () => {
     expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
     expect(registry.isSessionConnected(unknownSessionId)).toBe(false);
   });
+
+  it("removes disconnected transport sockets and reports the last socket for a Session ID", () => {
+    const registry = createRealtimeConnectionRegistry();
+    const teacherSessionId = "teacher-session-1" as SessionId;
+
+    registry.registerSessionSocket(teacherSessionId, "teacher-socket-1");
+    registry.registerSessionSocket(teacherSessionId, "teacher-socket-2");
+
+    expect(registry.unregisterSocket("unknown-socket")).toBeUndefined();
+
+    expect(registry.unregisterSocket("teacher-socket-1")).toEqual({
+      sessionId: teacherSessionId,
+      socketId: "teacher-socket-1",
+      remainingSocketCount: 1,
+      isLastSocketForSession: false,
+    });
+    expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
+    expect(registry.getSocketIds(teacherSessionId)).toEqual([
+      "teacher-socket-2",
+    ]);
+
+    expect(registry.unregisterSocket("teacher-socket-2")).toEqual({
+      sessionId: teacherSessionId,
+      socketId: "teacher-socket-2",
+      remainingSocketCount: 0,
+      isLastSocketForSession: true,
+    });
+    expect(registry.isSessionConnected(teacherSessionId)).toBe(false);
+    expect(registry.getSocketIds(teacherSessionId)).toEqual([]);
+    expect(registry.getSessionIds()).toEqual([]);
+  });
 });
