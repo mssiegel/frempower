@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import type {
   ActivityId,
   ChatMessageSnapshot,
@@ -31,6 +34,18 @@ type DeliveredEvent = {
   eventName: RoomDeliveryEvent;
   payload: RoomDeliveryPayload;
 };
+
+const sourceRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+const listSourceFiles = (directory: string): string[] =>
+  readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const entryPath = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      return listSourceFiles(entryPath);
+    }
+
+    return entry.isFile() && entry.name.endsWith(".ts") ? [entryPath] : [];
+  });
 
 const createRoomScopedDeliveryServer = () => {
   const socketIdsByRoomName = new Map<string, Set<string>>();
@@ -379,5 +394,54 @@ describe("realtime room delivery", () => {
     ]);
     expect(roomDelivery.getDeliveredEvents("student-3")).toEqual([]);
     expect(roomDelivery.getDeliveredEvents("teacher-socket-1")).toEqual([]);
+  });
+
+  it("keeps audience-specific realtime event emits behind room delivery helpers", () => {
+    const roomDeliveryPath = join(sourceRoot, "realtime", "roomDelivery.ts");
+    const audienceScopedEvents = [
+      {
+        constantName: "teacherActivitySnapshot",
+        eventName: REALTIME_EVENTS.teacherActivitySnapshot,
+      },
+      {
+        constantName: "studentActivitySnapshot",
+        eventName: REALTIME_EVENTS.studentActivitySnapshot,
+      },
+      {
+        constantName: "chatSendMessage",
+        eventName: REALTIME_EVENTS.chatSendMessage,
+      },
+      {
+        constantName: "chatTyping",
+        eventName: REALTIME_EVENTS.chatTyping,
+      },
+    ] as const;
+    const globalEmitReferences = listSourceFiles(sourceRoot)
+      .filter((sourceFilePath) => !sourceFilePath.endsWith(".test.ts"))
+      .filter((sourceFilePath) => sourceFilePath !== roomDeliveryPath)
+      .flatMap((sourceFilePath) => {
+        const source = readFileSync(sourceFilePath, "utf8");
+        const sourceLines = source.split(/\r?\n/);
+
+        return sourceLines.flatMap((line, lineIndex) => {
+          if (
+            !line.includes(".emit(") ||
+            !audienceScopedEvents.some(
+              ({ constantName, eventName }) =>
+                line.includes(`REALTIME_EVENTS.${constantName}`) ||
+                line.includes(`"${eventName}"`) ||
+                line.includes(`'${eventName}'`),
+            )
+          ) {
+            return [];
+          }
+
+          return [
+            `${relative(sourceRoot, sourceFilePath)}:${lineIndex + 1}: ${line.trim()}`,
+          ];
+        });
+      });
+
+    expect(globalEmitReferences).toEqual([]);
   });
 });
