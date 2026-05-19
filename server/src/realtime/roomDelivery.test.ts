@@ -1,5 +1,7 @@
 import type {
   ActivityId,
+  ChatMessageSnapshot,
+  EntityId,
   SessionId,
   StudentActivitySnapshot,
   TeacherActivitySnapshot,
@@ -7,6 +9,7 @@ import type {
 import { REALTIME_EVENTS } from "@frempower/shared";
 import { describe, expect, it } from "vitest";
 import {
+  emitChatMessageToPairingRoom,
   emitStudentActivitySnapshotToSessionRoom,
   emitTeacherActivitySnapshotToRoom,
   type RealtimeRoomDeliveryServer,
@@ -100,6 +103,46 @@ describe("realtime room delivery", () => {
       {
         eventName: REALTIME_EVENTS.studentActivitySnapshot,
         payload: snapshot,
+      },
+    ]);
+  });
+
+  it("emits chat messages to the active Pairing room", () => {
+    const pairingId = "pairing-1" as EntityId;
+    const emitted: Array<{
+      eventName: typeof REALTIME_EVENTS.chatSendMessage;
+      payload: ChatMessageSnapshot;
+    }> = [];
+    const roomNames: string[] = [];
+    const target: RealtimeRoomDeliveryTarget = {
+      emit(eventName, payload) {
+        if (eventName !== REALTIME_EVENTS.chatSendMessage) {
+          throw new Error(`Unexpected event: ${eventName}`);
+        }
+        emitted.push({ eventName, payload: payload as ChatMessageSnapshot });
+      },
+    };
+    const server: RealtimeRoomDeliveryServer = {
+      to(roomName) {
+        roomNames.push(roomName);
+
+        return target;
+      },
+    };
+    const message: ChatMessageSnapshot = {
+      id: "message-1",
+      senderStudentId: "student-1",
+      senderCharacterName: "Character 1",
+      text: "Hello there",
+    };
+
+    emitChatMessageToPairingRoom(server, pairingId, message);
+
+    expect(roomNames).toEqual(["frempower:pairing:pairing-1"]);
+    expect(emitted).toEqual([
+      {
+        eventName: REALTIME_EVENTS.chatSendMessage,
+        payload: message,
       },
     ]);
   });
