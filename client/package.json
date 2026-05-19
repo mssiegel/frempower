@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "lint": "tsc --noEmit",
-    "test": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests && tsc --noEmit",
     "preview": "vite preview"
   },
   "dependencies": {

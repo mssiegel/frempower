@@ -1,70 +1,70 @@
-Issue #2 progress
+Current Codebase Socket.IO implementation progress
 
-Completed:
-- Created the root npm workspace with `client` and `server` packages.
-- Scaffolded the Client as a Vite React TypeScript app.
-- Added Material UI, React Router, Socket.IO client, Inter font, and React Compiler config.
+Current mode:
+- Ralph remains human-in-the-loop.
+- `ralph-once.sh` works through local issue files under `local/issues/` in numeric order.
+- Each Ralph iteration implements exactly one unchecked acceptance criterion from the selected local issue.
+- Iteration diffs are left uncommitted for software engineering author review.
+
+Current local issue:
+- `local/issues/004-recover-authoritative-state-after-reconnect.md` is complete.
+
+Completed local issues:
+- `local/issues/001-configure-realtime-heartbeat-baseline.md`
+- `local/issues/002-add-session-room-routing-foundation.md`
+- `local/issues/003-emit-realtime-updates-through-rooms.md`
+- `local/issues/004-recover-authoritative-state-after-reconnect.md`
+
+Completed criteria:
+- `local/issues/001-configure-realtime-heartbeat-baseline.md`: The Realtime Server configures explicit Socket.IO `pingInterval` and `pingTimeout` values.
+- `local/issues/001-configure-realtime-heartbeat-baseline.md`: The chosen heartbeat values are shorter than the existing domain reconnect grace periods.
+- `local/issues/001-configure-realtime-heartbeat-baseline.md`: Server disconnect logging or instrumentation clearly treats Socket.IO disconnect as the transport-level signal for future **Teacher Disconnect** and **Student Disconnect** behavior.
+- `local/issues/001-configure-realtime-heartbeat-baseline.md`: The Client connection hook reflects connected and disconnected states from Socket.IO events.
+- `local/issues/001-configure-realtime-heartbeat-baseline.md`: Tests or a small verification path cover connection and disconnect state changes.
+- `local/issues/002-add-session-room-routing-foundation.md`: The Realtime Server has a connection registry that tracks `Session ID -> current socket ID`.
+- `local/issues/002-add-session-room-routing-foundation.md`: The registry enforces only one live socket connection per **Session ID**.
+- `local/issues/002-add-session-room-routing-foundation.md`: If a new socket resumes the same **Session ID**, the registry replaces the old socket with the new current socket.
+- `local/issues/002-add-session-room-routing-foundation.md`: A participant is considered connected while the current socket remains registered for the **Session ID**.
+- `local/issues/002-add-session-room-routing-foundation.md`: The registry removes the current socket on disconnect and reports when the **Session ID** has no current socket.
+- `local/issues/002-add-session-room-routing-foundation.md`: Server-private room naming helpers exist for **Session ID** rooms, teacher activity rooms, and active **Pairing** rooms.
+- `local/issues/002-add-session-room-routing-foundation.md`: Tests cover single-live-socket replacement, current-socket disconnect, and room name stability.
+- `local/issues/003-emit-realtime-updates-through-rooms.md`: The Realtime Server exposes or uses helpers for emitting to the teacher activity room.
+- `local/issues/003-emit-realtime-updates-through-rooms.md`: The Realtime Server exposes or uses helpers for emitting to the current socket in a student **Session ID** room.
+- `local/issues/003-emit-realtime-updates-through-rooms.md`: The Realtime Server exposes or uses helpers for emitting to an active **Pairing** room.
+- `local/issues/003-emit-realtime-updates-through-rooms.md`: Room delivery assumes only one live socket per **Session ID**.
+- `local/issues/003-emit-realtime-updates-through-rooms.md`: Tests prove that a message targeted to one room is not delivered to sockets outside that room.
+- `local/issues/003-emit-realtime-updates-through-rooms.md`: No new realtime path uses global broadcast plus application-side filtering for teacher, student, or pairing audiences.
+- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Resume handling sends a fresh teacher or student snapshot for the reconnecting **Session ID** when authoritative state exists.
+- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Resume handling treats the newest socket for a **Session ID** as current and disconnects any older socket for that **Session ID**.
+- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Missed removed, activity-ended, pairing-ended, and chat state are represented as snapshot state rather than transient-only notifications.
+- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Chat messages are stored in in-memory pairing state before realtime delivery.
+- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Typing indicators remain ephemeral and are allowed to expire during disconnects.
+- `local/issues/004-recover-authoritative-state-after-reconnect.md`: Tests cover reconnecting after a missed state change and receiving the current snapshot on the newest socket.
+- `local/issues/004-recover-authoritative-state-after-reconnect.md`: The Socket.IO layer does not make socket IDs participant identity.
 
 Changed:
-- Added root `package.json` with npm workspaces for `client` and `server`.
-- Added minimal package metadata for `@frempower/client`.
-- Added minimal package metadata for `@frempower/server`.
-- Generated `package-lock.json` from npm workspace install.
-- Added React, React DOM, Vite, TypeScript, and Vite React plugin dependencies to `@frempower/client`.
-- Added client Vite, TypeScript, HTML, React entry, and minimal app shell files.
-- Added Client dependencies for Material UI, Emotion, React Router, Socket.IO client, and Inter font assets.
-- Added Client dev dependencies for React Compiler integration with Vite.
-- Configured Vite to run the React Compiler preset through the current `@vitejs/plugin-react` API.
-- Imported Inter font weights in the Client entrypoint and set Inter as the first CSS font family.
-- Marked the completed PRD task as done.
-- Added the Client Material UI theme using the approved primary, secondary, neutral, text, and background colors.
-- Wrapped the Client with Material UI `ThemeProvider` and `CssBaseline`.
-- Marked the Material UI theme PRD task as done.
-- Added Client route wiring for `/`, `/teacher`, and `/student` with React Router.
-- Marked the completed route PRD task as done.
-- Added visible placeholder pages for the Homepage, Teacher Page, and Student Page.
-- Marked the completed placeholder pages PRD task as done.
-- Added Homepage SEO-oriented HTML metadata.
-- Replaced the Homepage placeholder with semantic header, navigation, main, section, heading, and list structure.
-- Marked the completed Homepage SEO and semantic structure PRD task as done.
-- Added Server dependencies for Express and Socket.IO.
-- Added Server dev dependencies for TypeScript, tsx, and Node/Express types.
-- Added Server build, dev, and start package scripts.
-- Added Server TypeScript configuration.
-- Added a minimal Server entrypoint that starts an Express HTTP server with Socket.IO attached.
-- Marked the completed Server scaffold PRD task as done.
-- Added a `GET /health` endpoint that returns `{ "status": "ok" }`.
-- Marked the completed health check endpoint PRD task as done.
-- Added basic Server Socket.IO connection and disconnect logging.
-- Added Client Realtime Connection wiring that is used only by the Teacher Page and Student Page placeholders.
-- Marked the completed Socket.IO connection wiring PRD task as done.
-- Configured the Client Vite dev server to proxy `/health` and `/socket.io` to the local Server on port 3001.
-- Marked the completed Client local Server and Socket.IO access PRD task as done.
-- Added root npm workspace scripts for `dev`, `build`, `lint`, and `test`.
-- Added `concurrently` as a root dev dependency so `npm run dev` can start the Client and Server together.
-- Marked the completed root command PRD task as done.
-- Added Client and Server workspace `lint` scripts that run TypeScript checks.
-- Added Client and Server workspace `test` scripts that run TypeScript checks for the scaffold baseline.
-- Marked the completed build, lint, and test PRD task as done.
+- Added a room-scoped helper for ephemeral `chat:typing` delivery to active Pairing rooms.
+- Added tests proving typing indicators are emitted only to the active Pairing room and are not sent to unrelated pairing, teacher, or session rooms.
+- Marked the final `local/issues/004-recover-authoritative-state-after-reconnect.md` criterion complete.
+- Marked the matching `PRD.md` backlog item complete because all issue 004 criteria are now checked.
+
+Key decisions:
+- Selected the typing indicator criterion because it was the only remaining unchecked acceptance criterion and completed the reconnect recovery issue.
+- Kept typing indicators in the Socket.IO room-delivery boundary as transient realtime events.
+- Did not add activity-service persistence, pending delivery, or snapshot recovery for typing indicators; they may expire during Realtime Connection loss.
+
+Blockers:
+- None.
+
+Files changed:
+- `server/src/realtime/roomDelivery.ts`
+- `server/src/realtime/roomDelivery.test.ts`
+- `local/issues/004-recover-authoritative-state-after-reconnect.md`
+- `PRD.md`
+- `progress.txt`
 
 Verification:
-- Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
-- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully.
-- Ran `npm run build -w client`; first attempt failed because the installed `@vitejs/plugin-react` no longer accepts the old `babel` option.
-- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after switching to `reactCompilerPreset` with `@rolldown/plugin-babel`.
-- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding the Material UI theme.
-- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding the Client routes.
-- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding visible placeholder pages.
-- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding Homepage metadata and semantic content.
-- Ran `npm run build -w server`; TypeScript compilation completed successfully after scaffolding the Server.
-- Ran `npm run build -w server`; TypeScript compilation completed successfully after adding the health check endpoint.
-- Ran a temporary built Server on port 3102 and requested `GET /health`; it returned `{"status":"ok"}`.
-- Ran `npm run build -w client`; TypeScript and Vite production build completed successfully after adding basic Realtime Connection wiring.
-- Ran `npm run build -w server`; TypeScript compilation completed successfully after adding Socket.IO connection logging.
-- Ran a temporary built Server on port 3103 and connected with `socket.io-client`; it logged a successful client connection id.
-- Ran temporary Server and Client dev servers, requested `GET /health` through the Client dev origin, and connected with `socket.io-client` through the Client dev origin; both succeeded.
-- Ran `npm install`; install completed successfully and reported 0 vulnerabilities.
-- Ran `npm run build`; the root workspace build completed successfully for both Client and Server.
-- Ran `npm run build`; the root workspace build completed successfully for both Client and Server.
-- Ran `npm run lint`; the root workspace lint command completed successfully for both Client and Server.
-- Ran `npm run test`; the root workspace test command completed successfully for both Client and Server.
+- Passed: `npm run test -w server`
+
+Recommended next iteration:
+- Start `local/issues/005-add-realtime-boundary-regression-tests.md`.

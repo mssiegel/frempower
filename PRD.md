@@ -1,80 +1,62 @@
-# Issue #2: Scaffold V1 App Shell
+# Current Codebase Socket.IO Implementation PRD
 
-Goal: Create the runnable Frempower V1 baseline across the Client and Server.
+Goal: Update the current Frempower Realtime Server and Realtime Connection implementation to follow the Socket.IO best practices captured in `docs/current-codebase-socketio-implementation-plan.md`.
+
+This PRD is intentionally scoped to the current codebase implementation. It is not a replacement for the GitHub V1 product issues. `ralph-once.sh` should use the local issue files under `local/issues/` and tackle them in numeric order.
+
+## Source Plan
+
+- `docs/current-codebase-socketio-implementation-plan.md`
 
 ## Known decisions
 
-- Use a root npm workspace.
-- Client lives in `client/`.
-- Server lives in `server/`.
-- Client: Vite, React, TypeScript, Material UI, React Router, Socket.IO client, React Compiler, Inter typography.
-- Server: Node.js, Express, TypeScript, Socket.IO.
-- State: no database for V1.
-- No Docker for issue #2.
-- Routes:
-  - `/` Homepage
-  - `/teacher` Teacher Page
-  - `/student` Student Page
-- Homepage is the only search-indexable Client page.
-- Teacher Page and Student Page are open app experiences, not authenticated dashboards.
-- Follow ADR-0001 and the context docs.
+- Use Socket.IO heartbeat/ping-pong settings to detect dead realtime connections.
+- Do not rely on TCP keepalive as the authority for **Teacher Disconnect** or **Student Disconnect** behavior.
+- Use Socket.IO rooms for **Session ID**, teacher activity, student snapshot, and active **Pairing** delivery.
+- Enforce only one live Realtime Connection per **Session ID**.
+- Treat a **Session ID** as one guest session in one browser tab; Version 1 has no database-backed multi-tab or multi-device login.
+- If a new socket resumes the same **Session ID**, the new socket replaces the old socket.
+- Do not broadcast globally and filter by activity, student, or pairing in application logic.
+- Keep authoritative activity and chat state in the activity service.
+- Recover missed authoritative state through audience-specific snapshots after reconnect.
+- Keep typing indicators ephemeral.
+- Keep server activity/domain logic separate from Socket.IO handlers.
+- Keep Ralph human-in-the-loop. `ralph-once.sh` runs one local issue criterion at a time and leaves diffs for software engineering author review.
 
-## Palette
+## Local Issue Backlog
 
-Primary:
+- [x] `local/issues/001-configure-realtime-heartbeat-baseline.md`
+- [x] `local/issues/002-add-session-room-routing-foundation.md`
+- [x] `local/issues/003-emit-realtime-updates-through-rooms.md`
+- [x] `local/issues/004-recover-authoritative-state-after-reconnect.md`
+- [ ] `local/issues/005-add-realtime-boundary-regression-tests.md`
 
-- `#070AC5`
-- `#5B5DF9`
-- `#9D9EFB`
-- `#C4C5FD`
-- `#EBECFE`
-- `#F8F8FF`
+Current Ralph status: `local/issues/004-recover-authoritative-state-after-reconnect.md` is complete. Next iteration should start `local/issues/005-add-realtime-boundary-regression-tests.md`.
 
-Secondary:
+## Ralph Workflow
 
-- `#95C021`
-- `#BFE35B`
-- `#DDF0A8`
-- `#F8FCEE`
-
-Neutrals:
-
-- `#2B313B`
-- `#4D586A`
-- `#718098`
-- `#A0AABA`
-- `#D0D5DD`
-- `#F3F4F6`
-- `#FFFFFF`
-
-Text:
-
-- primary `#2B313B`
-- secondary `#718098`
-
-## Tasks
-
-- [x] Create a root npm workspace with `client` and `server` packages.
-- [x] Scaffold the Client as a Vite React TypeScript app.
-- [x] Add Material UI, React Router, Socket.IO client, Inter font, and React Compiler config.
-- [x] Add the Material UI theme using the approved palette.
-- [x] Add routes for `/`, `/teacher`, and `/student`.
-- [x] Add visible placeholder pages for Homepage, Teacher Page, and Student Page.
-- [x] Give the Homepage SEO-oriented metadata and semantic content structure.
-- [x] Scaffold the Server with Node.js, Express, TypeScript, and Socket.IO.
-- [x] Add a health check endpoint.
-- [x] Add basic Socket.IO connection wiring. only teachers page and students page need socket connections (not the homepage)
-- [x] Configure Client local access to the Server and Socket.IO endpoint.
-- [x] Add root build, lint, test, and dev commands.
-- [x] Make build, lint, and test pass.
+1. Run `./ralph-once.sh`.
+2. The script selects the lowest-numbered local issue with unchecked acceptance criteria.
+3. Ralph implements exactly one unchecked acceptance criterion from that issue.
+4. Ralph marks that criterion complete in the local issue only after verification passes, or records the blocker in `progress.txt`.
+5. When a local issue has no remaining unchecked acceptance criteria, Ralph marks the matching backlog item complete in this PRD.
+6. Ralph updates `progress.txt` every iteration.
+7. Ralph does not commit, push, merge, close GitHub issues, or modify GitHub issues.
 
 ## Constraints
 
-- Do not implement the full Classroom Activity workflow yet.
 - Do not add authentication.
 - Do not add a database.
 - Do not add Docker, Docker Compose, dev containers, or container-specific scripts.
-- Keep this baseline simple and boring.
-- Prefer known-working defaults over clever architecture.
-- Use local npm workspace scripts for development, build, lint, and test.
-- Use project terminology from `client/CONTEXT.md` and `server/CONTEXT.md`.
+- Do not implement unrelated host, join, pairing, or chat product flows.
+- Do not use socket IDs as participant identity.
+- Do not support multiple live browser tabs for one guest session in Version 1.
+- Prefer small, reviewable diffs.
+- Run the most relevant feedback loop before marking a criterion complete.
+- Leave Ralph iteration diffs uncommitted for software engineering author review.
+
+## Verification
+
+- Run focused tests or type checks for the criterion Ralph completes.
+- Before a Ralph criterion is marked complete, update the local issue file and `progress.txt`.
+- Do not declare a local issue complete in this PRD until all acceptance criteria in that local issue are checked.

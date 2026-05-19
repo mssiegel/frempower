@@ -5,7 +5,10 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import "./index.css";
-import { useRealtimeConnection } from "./realtime";
+import {
+  type RealtimeConnectionState,
+  useRealtimeConnection,
+} from "./realtime";
 
 function Homepage() {
   return (
@@ -119,7 +122,7 @@ function Homepage() {
                   two students.
                 </li>
                 <li>
-                  Students can prepare to join with a display name and chat when
+                  Students can prepare to join with their name and chat when
                   paired.
                 </li>
                 <li>
@@ -203,7 +206,7 @@ function PagePlaceholder({
 }
 
 function RealtimeConnectionStatus() {
-  const { isConnected } = useRealtimeConnection();
+  const { isConnected, status } = useRealtimeConnection();
 
   return (
     <Typography
@@ -213,9 +216,21 @@ function RealtimeConnectionStatus() {
         fontWeight: 700,
       }}
     >
-      Realtime Connection: {isConnected ? "Connected" : "Connecting"}
+      Realtime Connection: {formatRealtimeConnectionStatus(status)}
     </Typography>
   );
+}
+
+function formatRealtimeConnectionStatus(status: RealtimeConnectionState) {
+  if (status === "connected") {
+    return "Connected";
+  }
+
+  if (status === "disconnected") {
+    return "Disconnected";
+  }
+
+  return "Connecting";
 }
 
 const router = createBrowserRouter([
@@ -238,7 +253,7 @@ const router = createBrowserRouter([
     path: "/student",
     element: (
       <PagePlaceholder
-        description="The Student Page will let a student enter a display name and participate in an assigned chat."
+        description="The Student Page will let a student enter their name and participate in an assigned chat."
         eyebrow="Open experience"
         title="Student Page"
         usesRealtimeConnection
