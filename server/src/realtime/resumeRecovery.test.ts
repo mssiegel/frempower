@@ -1,7 +1,9 @@
 import type {
   ActivityId,
+  EntityId,
   JoinCode,
   SessionId,
+  StudentActivitySnapshot,
   TeacherActivitySnapshot,
 } from "@frempower/shared";
 import {
@@ -16,6 +18,7 @@ import type {
   RealtimeRoomDeliveryTarget,
 } from "./roomDelivery.js";
 import {
+  buildStudentActivitySnapshot,
   buildTeacherActivitySnapshot,
   sendTeacherResumeRecoverySnapshot,
   type RealtimeResumeSocket,
@@ -83,6 +86,76 @@ describe("realtime resume recovery", () => {
     const activity = createActivity({
       peerRealNameVisibility: true,
       characterNames: ["Mediator", "Historian"],
+      lobbyStudents: [
+        {
+          id: "student-3" as EntityId,
+          studentRealName: "Grace",
+          connectionStatus: "connected",
+        },
+      ],
+      activePairings: [
+        {
+          id: "pairing-1" as EntityId,
+          participants: [
+            {
+              studentId: "student-1" as EntityId,
+              studentRealName: "Ada",
+              characterName: "Mediator",
+              connectionStatus: "connected",
+            },
+            {
+              studentId: "student-2" as EntityId,
+              studentRealName: "Linus",
+              characterName: "Historian",
+              connectionStatus: "connected",
+            },
+          ],
+          recentMessages: [
+            {
+              id: "message-1" as EntityId,
+              senderStudentId: "student-1" as EntityId,
+              senderCharacterName: "Mediator",
+              text: "We should compare notes.",
+            },
+          ],
+        },
+      ],
+      completedChats: [
+        {
+          id: "completed-chat-1" as EntityId,
+          pairingId: "pairing-ended-1" as EntityId,
+          participants: [
+            {
+              studentId: "student-4" as EntityId,
+              studentRealName: "Katherine",
+              characterName: "Mediator",
+              connectionStatus: "connected",
+            },
+            {
+              studentId: "student-5" as EntityId,
+              studentRealName: "Edsger",
+              characterName: "Historian",
+              connectionStatus: "connected",
+            },
+          ],
+          previewMessages: [
+            {
+              id: "message-2" as EntityId,
+              senderStudentId: "student-4" as EntityId,
+              senderCharacterName: "Mediator",
+              text: "Finished.",
+            },
+          ],
+          messages: [
+            {
+              id: "message-2" as EntityId,
+              senderStudentId: "student-4" as EntityId,
+              senderCharacterName: "Mediator",
+              text: "Finished.",
+            },
+          ],
+        },
+      ],
     });
 
     expect(buildTeacherActivitySnapshot(activity)).toEqual({
@@ -91,16 +164,111 @@ describe("realtime resume recovery", () => {
       characterNames: ["Mediator", "Historian"],
       teacherEmail: "teacher@example.com",
       peerRealNameVisibility: true,
-      lobbyStudents: [],
-      activePairings: [],
-      completedChats: [],
+      lobbyStudents: activity.lobbyStudents,
+      activePairings: activity.activePairings,
+      completedChats: activity.completedChats,
       counts: {
-        totalLiveStudents: 0,
-        lobbyStudents: 0,
-        studentsInChats: 0,
-        completedChats: 0,
+        totalLiveStudents: 3,
+        lobbyStudents: 1,
+        studentsInChats: 2,
+        completedChats: 1,
       },
     });
+  });
+
+  it("builds student snapshots for missed removed, activity-ended, pairing-ended, and chat state", () => {
+    const activeChatSnapshot: StudentActivitySnapshot = {
+      activityId: "stale" as ActivityId,
+      joinCode: "stale" as JoinCode,
+      studentId: "student-1" as EntityId,
+      studentRealName: "Ada",
+      state: "active_pairing",
+      activePairing: {
+        id: "pairing-1" as EntityId,
+        ownCharacterName: "Mediator",
+        peer: {
+          studentId: "student-2" as EntityId,
+          characterName: "Historian",
+          studentRealName: "Linus",
+          connectionStatus: "connected",
+        },
+        messages: [
+          {
+            id: "message-1" as EntityId,
+            senderStudentId: "student-2" as EntityId,
+            senderCharacterName: "Historian",
+            text: "A missed chat message.",
+          },
+        ],
+      },
+    };
+    const removedSnapshot: StudentActivitySnapshot = {
+      activityId: "stale" as ActivityId,
+      joinCode: "stale" as JoinCode,
+      studentId: "student-3" as EntityId,
+      studentRealName: "Grace",
+      state: "removed",
+    };
+    const pairingEndedSnapshot: StudentActivitySnapshot = {
+      activityId: "stale" as ActivityId,
+      joinCode: "stale" as JoinCode,
+      studentId: "student-4" as EntityId,
+      studentRealName: "Katherine",
+      state: "chat_ended",
+      endedPairingId: "pairing-ended-1" as EntityId,
+    };
+    const activityEndedSnapshot: StudentActivitySnapshot = {
+      activityId: "stale" as ActivityId,
+      joinCode: "stale" as JoinCode,
+      studentId: "student-5" as EntityId,
+      studentRealName: "Edsger",
+      state: "activity_ended",
+    };
+    const activity = createActivity({
+      studentSnapshotsBySessionId: {
+        ["student-session-active" as SessionId]: activeChatSnapshot,
+        ["student-session-removed" as SessionId]: removedSnapshot,
+        ["student-session-pairing-ended" as SessionId]: pairingEndedSnapshot,
+        ["student-session-activity-ended" as SessionId]: activityEndedSnapshot,
+      },
+    });
+
+    expect(
+      buildStudentActivitySnapshot(
+        activity,
+        "student-session-active" as SessionId
+      )
+    ).toEqual({
+      ...activeChatSnapshot,
+      activityId: "12345",
+      joinCode: "12345",
+    });
+    expect(
+      buildStudentActivitySnapshot(
+        activity,
+        "student-session-removed" as SessionId
+      )?.state
+    ).toBe("removed");
+    expect(
+      buildStudentActivitySnapshot(
+        activity,
+        "student-session-pairing-ended" as SessionId
+      )
+    ).toMatchObject({
+      activityId: "12345",
+      joinCode: "12345",
+      state: "chat_ended",
+      endedPairingId: "pairing-ended-1",
+    });
+    expect(
+      buildStudentActivitySnapshot(
+        activity,
+        "student-session-activity-ended" as SessionId
+      )?.state
+    ).toBe("activity_ended");
+    expect(
+      buildStudentActivitySnapshot(activity, "unknown-session" as SessionId)
+    ).toBeUndefined();
   });
 
   it("sends a fresh teacher snapshot for the reconnecting Session ID when authoritative state exists", () => {

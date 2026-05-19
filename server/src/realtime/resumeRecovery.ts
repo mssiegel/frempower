@@ -2,6 +2,7 @@ import type {
   ActivityId,
   CommandAcknowledgementResult,
   SessionId,
+  StudentActivitySnapshot,
   TeacherActivitySnapshot,
 } from "@frempower/shared";
 import {
@@ -52,16 +53,45 @@ export const buildTeacherActivitySnapshot = (
   characterNames: activity.characterNames,
   teacherEmail: activity.teacherEmail,
   peerRealNameVisibility: activity.peerRealNameVisibility,
-  lobbyStudents: [],
-  activePairings: [],
-  completedChats: [],
+  lobbyStudents: activity.lobbyStudents ?? [],
+  activePairings: activity.activePairings ?? [],
+  completedChats: activity.completedChats ?? [],
   counts: {
-    totalLiveStudents: 0,
-    lobbyStudents: 0,
-    studentsInChats: 0,
-    completedChats: 0,
+    totalLiveStudents:
+      (activity.lobbyStudents?.length ?? 0) +
+      (activity.activePairings?.length ?? 0) * 2,
+    lobbyStudents: activity.lobbyStudents?.length ?? 0,
+    studentsInChats: (activity.activePairings?.length ?? 0) * 2,
+    completedChats: activity.completedChats?.length ?? 0,
   },
 });
+
+export const buildStudentActivitySnapshot = (
+  activity: ClassroomActivityRecord,
+  sessionId: SessionId
+): StudentActivitySnapshot | undefined => {
+  const snapshot = activity.studentSnapshotsBySessionId?.[sessionId];
+
+  if (snapshot === undefined) {
+    return undefined;
+  }
+
+  return {
+    ...snapshot,
+    activityId: activity.activityId,
+    joinCode: activity.joinCode,
+    activePairing:
+      snapshot.activePairing === undefined
+        ? undefined
+        : {
+            ...snapshot.activePairing,
+            peer: { ...snapshot.activePairing.peer },
+            messages: snapshot.activePairing.messages.map((message) => ({
+              ...message,
+            })),
+          },
+  };
+};
 
 export const sendTeacherResumeRecoverySnapshot = ({
   activityService,

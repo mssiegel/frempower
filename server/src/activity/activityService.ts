@@ -1,9 +1,13 @@
 import type {
   ActivityId,
   CharacterName,
+  CompletedChatSnapshot,
   JoinCode,
   SessionId,
+  StudentActivitySnapshot,
   TeacherEmail,
+  TeacherActivePairingSnapshot,
+  TeacherSnapshotLobbyStudent,
 } from "@frempower/shared";
 import { JOIN_CODE_MAX, JOIN_CODE_MIN } from "@frempower/shared";
 
@@ -17,6 +21,12 @@ export type ClassroomActivityRecord = {
   teacherEmail?: TeacherEmail;
   peerRealNameVisibility: boolean;
   status: ClassroomActivityStatus;
+  lobbyStudents?: TeacherSnapshotLobbyStudent[];
+  activePairings?: TeacherActivePairingSnapshot[];
+  completedChats?: CompletedChatSnapshot[];
+  studentSnapshotsBySessionId?: Partial<
+    Record<SessionId, StudentActivitySnapshot>
+  >;
 };
 
 export type ActivityServiceChangeReason =
@@ -29,9 +39,7 @@ export type ActivityServiceChange = {
   reason: ActivityServiceChangeReason;
 };
 
-export type ActivityServiceSubscriber = (
-  change: ActivityServiceChange,
-) => void;
+export type ActivityServiceSubscriber = (change: ActivityServiceChange) => void;
 
 export type ActivityService = {
   subscribe(subscriber: ActivityServiceSubscriber): () => void;
@@ -50,7 +58,7 @@ export type ActivityServiceRandom = {
 };
 
 export type ActivityServiceJoinCodeGenerator = (
-  reservedJoinCodes: ReadonlySet<JoinCode>,
+  reservedJoinCodes: ReadonlySet<JoinCode>
 ) => JoinCode;
 
 export type ActivityServiceDependencies = {
@@ -80,7 +88,7 @@ export const createRandomJoinCodeGenerator =
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
       const randomOffset = Math.min(
         Math.floor(random.next() * joinCodeRangeSize),
-        joinCodeRangeSize - 1,
+        joinCodeRangeSize - 1
       );
       const joinCode = String(JOIN_CODE_MIN + randomOffset) as JoinCode;
 
@@ -93,7 +101,7 @@ export const createRandomJoinCodeGenerator =
   };
 
 export const createActivityServiceDependencies = (
-  overrides: Partial<ActivityServiceDependencies> = {},
+  overrides: Partial<ActivityServiceDependencies> = {}
 ): ActivityServiceDependencies => {
   const clock = overrides.clock ?? createDefaultClock();
   const random = overrides.random ?? createDefaultRandom();
@@ -107,18 +115,67 @@ export const createActivityServiceDependencies = (
 };
 
 export const createInMemoryActivityService = (
-  options: CreateInMemoryActivityServiceOptions = {},
+  options: CreateInMemoryActivityServiceOptions = {}
 ): ActivityService => {
   const dependencies = createActivityServiceDependencies(options.dependencies);
   const activities = new Map<ActivityId, ClassroomActivityRecord>();
   const reservedJoinCodes = new Set<JoinCode>();
   const subscribers = new Set<ActivityServiceSubscriber>();
 
+  const cloneStudentSnapshot = (
+    snapshot: StudentActivitySnapshot
+  ): StudentActivitySnapshot => ({
+    ...snapshot,
+    activePairing:
+      snapshot.activePairing === undefined
+        ? undefined
+        : {
+            ...snapshot.activePairing,
+            peer: { ...snapshot.activePairing.peer },
+            messages: snapshot.activePairing.messages.map((message) => ({
+              ...message,
+            })),
+          },
+  });
+
   const cloneActivity = (
-    activity: ClassroomActivityRecord,
+    activity: ClassroomActivityRecord
   ): ClassroomActivityRecord => ({
     ...activity,
     characterNames: [...activity.characterNames],
+    lobbyStudents: activity.lobbyStudents?.map((student) => ({ ...student })),
+    activePairings: activity.activePairings?.map((pairing) => ({
+      ...pairing,
+      participants: [
+        { ...pairing.participants[0] },
+        { ...pairing.participants[1] },
+      ],
+      recentMessages: pairing.recentMessages.map((message) => ({ ...message })),
+    })),
+    completedChats: activity.completedChats?.map((completedChat) => ({
+      ...completedChat,
+      participants: [
+        { ...completedChat.participants[0] },
+        { ...completedChat.participants[1] },
+      ],
+      previewMessages: completedChat.previewMessages.map((message) => ({
+        ...message,
+      })),
+      messages: completedChat.messages.map((message) => ({ ...message })),
+    })),
+    studentSnapshotsBySessionId:
+      activity.studentSnapshotsBySessionId === undefined
+        ? undefined
+        : Object.fromEntries(
+            Object.entries(activity.studentSnapshotsBySessionId).map(
+              ([sessionId, snapshot]) => [
+                sessionId,
+                snapshot === undefined
+                  ? undefined
+                  : cloneStudentSnapshot(snapshot),
+              ]
+            )
+          ),
   });
 
   return {
