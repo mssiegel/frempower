@@ -62,7 +62,7 @@ describe("realtime connection registry", () => {
     expect(registry.unregisterSocket("teacher-socket-1")).toBeUndefined();
   });
 
-  it("considers a Session ID connected while it has at least one registered transport socket", () => {
+  it("considers a Session ID connected while its current transport socket remains registered", () => {
     const registry = createRealtimeConnectionRegistry();
     const teacherSessionId = "teacher-session-1" as SessionId;
     const unknownSessionId = "unknown-session" as SessionId;
@@ -73,6 +73,11 @@ describe("realtime connection registry", () => {
 
     expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
     expect(registry.isSessionConnected(unknownSessionId)).toBe(false);
+
+    registry.registerSessionSocket(teacherSessionId, "teacher-socket-2");
+
+    expect(registry.unregisterSocket("teacher-socket-1")).toBeUndefined();
+    expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
   });
 
   it("removes disconnected transport sockets and reports the last socket for a Session ID", () => {
