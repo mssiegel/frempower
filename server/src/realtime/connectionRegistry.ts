@@ -9,11 +9,17 @@ export type RealtimeSocketDisconnectResult = {
   isLastSocketForSession: boolean;
 };
 
+export type RealtimeSocketRegistrationResult = {
+  sessionId: SessionId;
+  socketId: TransportSocketId;
+  replacedSocketId?: TransportSocketId;
+};
+
 export type RealtimeConnectionRegistry = {
   registerSessionSocket(
     sessionId: SessionId,
     socketId: TransportSocketId,
-  ): void;
+  ): RealtimeSocketRegistrationResult;
   unregisterSocket(
     socketId: TransportSocketId,
   ): RealtimeSocketDisconnectResult | undefined;
@@ -43,6 +49,16 @@ export const createRealtimeConnectionRegistry =
 
         socketIdBySessionId.set(sessionId, socketId);
         sessionIdBySocketId.set(socketId, sessionId);
+
+        const registrationResult: RealtimeSocketRegistrationResult = {
+          sessionId,
+          socketId,
+        };
+        if (replacedSocketId !== undefined && replacedSocketId !== socketId) {
+          registrationResult.replacedSocketId = replacedSocketId;
+        }
+
+        return registrationResult;
       },
 
       unregisterSocket(socketId) {

@@ -8,7 +8,12 @@ describe("realtime connection registry", () => {
     const teacherSessionId = "teacher-session-1" as SessionId;
     const studentSessionId = "student-session-1" as SessionId;
 
-    registry.registerSessionSocket(teacherSessionId, "teacher-socket-1");
+    expect(
+      registry.registerSessionSocket(teacherSessionId, "teacher-socket-1"),
+    ).toEqual({
+      sessionId: teacherSessionId,
+      socketId: "teacher-socket-1",
+    });
     registry.registerSessionSocket(studentSessionId, "student-socket-1");
 
     expect(registry.getSocketIds(teacherSessionId)).toEqual([
@@ -36,6 +41,25 @@ describe("realtime connection registry", () => {
     expect(registry.getSessionIds()).toEqual([teacherSessionId]);
     expect(registry.unregisterSocket("teacher-socket-1")).toBeUndefined();
     expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
+  });
+
+  it("reports the replaced transport socket when a Session ID resumes on a new socket", () => {
+    const registry = createRealtimeConnectionRegistry();
+    const teacherSessionId = "teacher-session-1" as SessionId;
+
+    registry.registerSessionSocket(teacherSessionId, "teacher-socket-1");
+
+    expect(
+      registry.registerSessionSocket(teacherSessionId, "teacher-socket-2"),
+    ).toEqual({
+      sessionId: teacherSessionId,
+      socketId: "teacher-socket-2",
+      replacedSocketId: "teacher-socket-1",
+    });
+    expect(registry.getSocketIds(teacherSessionId)).toEqual([
+      "teacher-socket-2",
+    ]);
+    expect(registry.unregisterSocket("teacher-socket-1")).toBeUndefined();
   });
 
   it("considers a Session ID connected while it has at least one registered transport socket", () => {
