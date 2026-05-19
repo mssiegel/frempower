@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "node:http";
 import { Server as SocketIOServer } from "socket.io";
 import { createInMemoryActivityService } from "./activity/activityService.js";
+import { createRealtimeTransportDisconnectSignal } from "./realtime/disconnectSignal.js";
 import { realtimeHeartbeat } from "./realtime/heartbeat.js";
 
 const port = Number(process.env.PORT ?? 3001);
@@ -19,7 +20,7 @@ io.on("connection", (socket) => {
   console.log(`Realtime Connection connected: ${socket.id}`);
 
   socket.on("disconnect", (reason) => {
-    console.log(`Realtime Connection disconnected: ${socket.id} (${reason})`);
+    console.info(createRealtimeTransportDisconnectSignal(socket.id, reason));
   });
 });
 
