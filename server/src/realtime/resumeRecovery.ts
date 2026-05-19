@@ -14,7 +14,10 @@ import type {
   ActivityService,
   ClassroomActivityRecord,
 } from "../activity/activityService.js";
-import type { RealtimeConnectionRegistry } from "./connectionRegistry.js";
+import type {
+  RealtimeConnectionRegistry,
+  TransportSocketId,
+} from "./connectionRegistry.js";
 import {
   emitTeacherActivitySnapshotToRoom,
   type RealtimeRoomDeliveryServer,
@@ -22,7 +25,7 @@ import {
 import { getSessionRoomName, getTeacherActivityRoomName } from "./roomNames.js";
 
 export type RealtimeResumeSocket = {
-  id: string;
+  id: TransportSocketId;
   join(roomName: string): void;
 };
 

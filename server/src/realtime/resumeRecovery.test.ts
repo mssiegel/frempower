@@ -535,4 +535,45 @@ describe("realtime resume recovery", () => {
     expect(delivery.emitted).toEqual([]);
     expect(disconnectedSocketIds).toEqual([]);
   });
+
+  it("does not authorize teacher resume from a known socket ID when the Session ID is not the teacher Session ID", () => {
+    const activity = createActivity();
+    const registry = createRealtimeConnectionRegistry();
+    const socket = createSocket("teacher-socket-1");
+    const delivery = createDeliveryServer();
+    const disconnectedSocketIds: string[] = [];
+
+    registry.registerSessionSocket(activity.teacherSessionId, socket.id);
+
+    const result = sendTeacherResumeRecoverySnapshot({
+      activityService: {
+        getActivity: () => activity,
+      },
+      deliveryServer: delivery.server,
+      registry,
+      socketReplacement: {
+        disconnectSocket: (socketId) => {
+          disconnectedSocketIds.push(socketId);
+        },
+      },
+      socket,
+      sessionId: "other-session" as SessionId,
+      activityId: activity.activityId,
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      error: {
+        code: COMMAND_ACKNOWLEDGEMENT_ERROR_CODES.forbidden,
+        message: "Session ID cannot resume this Classroom Activity.",
+      },
+    });
+    expect(registry.getSocketIds(activity.teacherSessionId)).toEqual([
+      socket.id,
+    ]);
+    expect(registry.getSocketIds("other-session" as SessionId)).toEqual([]);
+    expect(socket.joinedRooms).toEqual([]);
+    expect(delivery.emitted).toEqual([]);
+    expect(disconnectedSocketIds).toEqual([]);
+  });
 });
