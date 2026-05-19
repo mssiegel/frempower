@@ -62,7 +62,7 @@ describe("realtime connection registry", () => {
     expect(registry.unregisterSocket("teacher-socket-1")).toBeUndefined();
   });
 
-  it("keeps the replacement socket current until that socket disconnects", () => {
+  it("keeps the newer Realtime Connection current when an older socket disconnects", () => {
     const registry = createRealtimeConnectionRegistry();
     const teacherSessionId = "teacher-session-1" as SessionId;
 
@@ -102,7 +102,7 @@ describe("realtime connection registry", () => {
     expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
   });
 
-  it("removes disconnected transport sockets and reports the last socket for a Session ID", () => {
+  it("removes the current Realtime Connection and reports the Session ID as disconnected", () => {
     const registry = createRealtimeConnectionRegistry();
     const teacherSessionId = "teacher-session-1" as SessionId;
 

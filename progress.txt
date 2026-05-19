@@ -44,15 +44,16 @@ Completed criteria:
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover explicit heartbeat configuration.
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover one **Session ID** allowing only one live socket.
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover a newer socket replacing an older socket for the same **Session ID**.
+- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover current-socket disconnect behavior.
 
 Changed:
-- Renamed the existing connection registry replacement regression test to state the V1 boundary contract in repo domain language: an older **Realtime Connection** is replaced when the same **Session ID** resumes on a newer socket.
+- Renamed the connection registry disconnect regression tests to state the V1 boundary contract in repo domain language: an older socket disconnect does not remove the newer **Realtime Connection**, and the current **Realtime Connection** disconnect reports the **Session ID** as disconnected.
 - Marked the matching acceptance criterion complete in `local/issues/005-add-realtime-boundary-regression-tests.md`.
 
 Key decisions:
-- Selected the topmost unchecked criterion: tests cover a newer socket replacing an older socket for the same **Session ID**.
+- Selected the topmost unchecked criterion: tests cover current-socket disconnect behavior.
 - Kept the change at the test boundary because the production registry behavior was already implemented and covered.
-- Preserved the existing assertions that the registration reports the replaced socket, the newer socket is current, and the older socket is no longer registered.
+- Preserved the existing assertions that stale socket disconnects are ignored, the newer socket remains current, and disconnecting the current socket removes the **Session ID** from the registry.
 
 Blockers:
 - None.
@@ -66,4 +67,4 @@ Verification:
 - Passed: `npm run test -w server`
 
 Recommended next iteration:
-- Continue `local/issues/005-add-realtime-boundary-regression-tests.md` with the next unchecked criterion: Tests cover current-socket disconnect behavior.
+- Continue `local/issues/005-add-realtime-boundary-regression-tests.md` with the next unchecked criterion: Tests cover rejoining rooms after reconnect or resume.
