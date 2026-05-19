@@ -2,14 +2,14 @@ import type { SessionId } from "@frempower/shared";
 import { describe, expect, it } from "vitest";
 import { createRealtimeConnectionRegistry } from "./connectionRegistry.js";
 
-describe("realtime connection registry", () => {
-  it("tracks current transport socket IDs by Session ID", () => {
+describe("Realtime Connection registry", () => {
+  it("tracks current Realtime Connection socket IDs by Session ID", () => {
     const registry = createRealtimeConnectionRegistry();
     const teacherSessionId = "teacher-session-1" as SessionId;
     const studentSessionId = "student-session-1" as SessionId;
 
     expect(
-      registry.registerSessionSocket(teacherSessionId, "teacher-socket-1"),
+      registry.registerSessionSocket(teacherSessionId, "teacher-socket-1")
     ).toEqual({
       sessionId: teacherSessionId,
       socketId: "teacher-socket-1",
@@ -50,7 +50,7 @@ describe("realtime connection registry", () => {
     registry.registerSessionSocket(teacherSessionId, "teacher-socket-1");
 
     expect(
-      registry.registerSessionSocket(teacherSessionId, "teacher-socket-2"),
+      registry.registerSessionSocket(teacherSessionId, "teacher-socket-2")
     ).toEqual({
       sessionId: teacherSessionId,
       socketId: "teacher-socket-2",
@@ -84,7 +84,7 @@ describe("realtime connection registry", () => {
     expect(registry.isSessionConnected(teacherSessionId)).toBe(false);
   });
 
-  it("considers a Session ID connected while its current transport socket remains registered", () => {
+  it("considers a Session ID connected while its current Realtime Connection socket remains registered", () => {
     const registry = createRealtimeConnectionRegistry();
     const teacherSessionId = "teacher-session-1" as SessionId;
     const unknownSessionId = "unknown-session" as SessionId;

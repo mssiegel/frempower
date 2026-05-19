@@ -15,8 +15,8 @@ import type {
   RealtimeRoomDeliveryTarget,
 } from "./roomDelivery.js";
 
-describe("chat message delivery", () => {
-  it("records chat messages in activity state before realtime delivery", () => {
+describe("Realtime Server chat message delivery", () => {
+  it("records Pairing chat messages in Classroom Activity state before Realtime Server delivery", () => {
     const orderedSteps: string[] = [];
     const activityId = "12345" as ActivityId;
     const pairingId = "pairing-1" as EntityId;
@@ -90,7 +90,7 @@ describe("chat message delivery", () => {
     ]);
   });
 
-  it("does not emit chat messages when activity state rejects the write", () => {
+  it("does not emit Pairing chat messages when Classroom Activity state rejects the write", () => {
     const activityService: RecordAndEmitChatMessageOptions["activityService"] =
       {
         recordChatMessage() {

@@ -92,8 +92,8 @@ const createRoomScopedDeliveryServer = () => {
   };
 };
 
-describe("realtime room delivery", () => {
-  it("emits teacher activity snapshots to the teacher activity room", () => {
+describe("Realtime Server room delivery", () => {
+  it("emits teacher Classroom Activity snapshots to the teacher activity room", () => {
     const activityId = "12345" as ActivityId;
     const emitted: Array<{
       eventName: typeof REALTIME_EVENTS.teacherActivitySnapshot;
@@ -105,7 +105,10 @@ describe("realtime room delivery", () => {
         if (eventName !== REALTIME_EVENTS.teacherActivitySnapshot) {
           throw new Error(`Unexpected event: ${eventName}`);
         }
-        emitted.push({ eventName, payload: payload as TeacherActivitySnapshot });
+        emitted.push({
+          eventName,
+          payload: payload as TeacherActivitySnapshot,
+        });
       },
     };
     const server: RealtimeRoomDeliveryServer = {
@@ -142,7 +145,7 @@ describe("realtime room delivery", () => {
     ]);
   });
 
-  it("emits student activity snapshots to the student Session ID room", () => {
+  it("emits student Classroom Activity snapshots to the student Session ID room", () => {
     const sessionId = "student-session-1" as SessionId;
     const registry = createRealtimeConnectionRegistry();
     registry.registerSessionSocket(sessionId, "student-socket-1");
@@ -156,7 +159,10 @@ describe("realtime room delivery", () => {
         if (eventName !== REALTIME_EVENTS.studentActivitySnapshot) {
           throw new Error(`Unexpected event: ${eventName}`);
         }
-        emitted.push({ eventName, payload: payload as StudentActivitySnapshot });
+        emitted.push({
+          eventName,
+          payload: payload as StudentActivitySnapshot,
+        });
       },
     };
     const server: RealtimeRoomDeliveryServer = {
@@ -179,8 +185,8 @@ describe("realtime room delivery", () => {
         server,
         registry,
         sessionId,
-        snapshot,
-      ),
+        snapshot
+      )
     ).toBe(true);
 
     expect(roomNames).toEqual(["frempower:session:student-session-1"]);
@@ -192,7 +198,7 @@ describe("realtime room delivery", () => {
     ]);
   });
 
-  it("does not emit student activity snapshots without exactly one current socket for the Session ID", () => {
+  it("does not emit student Classroom Activity snapshots without exactly one current Realtime Connection for the Session ID", () => {
     const sessionId = "student-session-1" as SessionId;
     const emitted: Array<{
       eventName: typeof REALTIME_EVENTS.studentActivitySnapshot;
@@ -202,7 +208,8 @@ describe("realtime room delivery", () => {
     const target: RealtimeRoomDeliveryTarget = {
       emit(eventName, payload) {
         emitted.push({
-          eventName: eventName as typeof REALTIME_EVENTS.studentActivitySnapshot,
+          eventName:
+            eventName as typeof REALTIME_EVENTS.studentActivitySnapshot,
           payload: payload as StudentActivitySnapshot,
         });
       },
@@ -227,16 +234,16 @@ describe("realtime room delivery", () => {
         server,
         { getSocketIds: () => [] },
         sessionId,
-        snapshot,
-      ),
+        snapshot
+      )
     ).toBe(false);
     expect(
       emitStudentActivitySnapshotToSessionRoom(
         server,
         { getSocketIds: () => ["student-socket-1", "student-socket-2"] },
         sessionId,
-        snapshot,
-      ),
+        snapshot
+      )
     ).toBe(false);
 
     expect(roomNames).toEqual([]);
@@ -322,16 +329,16 @@ describe("realtime room delivery", () => {
     ]);
   });
 
-  it("does not deliver teacher activity snapshots to sockets outside the teacher activity room", () => {
+  it("does not deliver teacher Classroom Activity snapshots to sockets outside the teacher activity room", () => {
     const activityId = "12345" as ActivityId;
     const roomDelivery = createRoomScopedDeliveryServer();
     roomDelivery.joinRoom(
       "frempower:activity:12345:teachers",
-      "teacher-socket-1",
+      "teacher-socket-1"
     );
     roomDelivery.joinRoom(
       "frempower:activity:67890:teachers",
-      "teacher-socket-2",
+      "teacher-socket-2"
     );
     roomDelivery.joinRoom("frempower:session:student-session-1", "student-1");
     const snapshot: TeacherActivitySnapshot = {
@@ -353,7 +360,7 @@ describe("realtime room delivery", () => {
     emitTeacherActivitySnapshotToRoom(
       roomDelivery.server,
       activityId,
-      snapshot,
+      snapshot
     );
 
     expect(roomDelivery.getDeliveredEvents("teacher-socket-1")).toEqual([
@@ -366,7 +373,7 @@ describe("realtime room delivery", () => {
     expect(roomDelivery.getDeliveredEvents("student-1")).toEqual([]);
   });
 
-  it("does not deliver student activity snapshots to sockets outside the Session ID room", () => {
+  it("does not deliver student Classroom Activity snapshots to sockets outside the Session ID room", () => {
     const sessionId = "student-session-1" as SessionId;
     const registry = createRealtimeConnectionRegistry();
     registry.registerSessionSocket(sessionId, "student-socket-1");
@@ -375,7 +382,7 @@ describe("realtime room delivery", () => {
     roomDelivery.joinRoom("frempower:session:student-session-2", "student-2");
     roomDelivery.joinRoom(
       "frempower:activity:12345:teachers",
-      "teacher-socket-1",
+      "teacher-socket-1"
     );
     const snapshot: StudentActivitySnapshot = {
       activityId: "12345",
@@ -390,8 +397,8 @@ describe("realtime room delivery", () => {
         roomDelivery.server,
         registry,
         sessionId,
-        snapshot,
-      ),
+        snapshot
+      )
     ).toBe(true);
 
     expect(roomDelivery.getDeliveredEvents("student-1")).toEqual([
@@ -412,7 +419,7 @@ describe("realtime room delivery", () => {
     roomDelivery.joinRoom("frempower:pairing:pairing-2", "student-3");
     roomDelivery.joinRoom(
       "frempower:activity:12345:teachers",
-      "teacher-socket-1",
+      "teacher-socket-1"
     );
     const message: ChatMessageSnapshot = {
       id: "message-1",
@@ -448,25 +455,25 @@ describe("realtime room delivery", () => {
     registry.registerSessionSocket(studentSessionId, "student-session-socket");
     roomDelivery.joinRoom(
       "frempower:activity:12345:teachers",
-      "teacher-socket-1",
+      "teacher-socket-1"
     );
     roomDelivery.joinRoom(
       "frempower:activity:67890:teachers",
-      "other-teacher-socket",
+      "other-teacher-socket"
     );
     roomDelivery.joinRoom(
       "frempower:session:student-session-1",
-      "student-session-socket",
+      "student-session-socket"
     );
     roomDelivery.joinRoom(
       "frempower:session:student-session-2",
-      "other-student-session-socket",
+      "other-student-session-socket"
     );
     roomDelivery.joinRoom("frempower:pairing:pairing-1", "pairing-student-1");
     roomDelivery.joinRoom("frempower:pairing:pairing-1", "pairing-student-2");
     roomDelivery.joinRoom(
       "frempower:pairing:pairing-2",
-      "other-pairing-student",
+      "other-pairing-student"
     );
     const teacherSnapshot: TeacherActivitySnapshot = {
       activityId,
@@ -500,15 +507,15 @@ describe("realtime room delivery", () => {
     emitTeacherActivitySnapshotToRoom(
       roomDelivery.server,
       activityId,
-      teacherSnapshot,
+      teacherSnapshot
     );
     expect(
       emitStudentActivitySnapshotToSessionRoom(
         roomDelivery.server,
         registry,
         studentSessionId,
-        studentSnapshot,
-      ),
+        studentSnapshot
+      )
     ).toBe(true);
     emitChatMessageToPairingRoom(roomDelivery.server, pairingId, message);
 
@@ -538,10 +545,10 @@ describe("realtime room delivery", () => {
     ]);
     expect(roomDelivery.getDeliveredEvents("other-teacher-socket")).toEqual([]);
     expect(
-      roomDelivery.getDeliveredEvents("other-student-session-socket"),
+      roomDelivery.getDeliveredEvents("other-student-session-socket")
     ).toEqual([]);
     expect(roomDelivery.getDeliveredEvents("other-pairing-student")).toEqual(
-      [],
+      []
     );
   });
 
@@ -553,7 +560,7 @@ describe("realtime room delivery", () => {
     roomDelivery.joinRoom("frempower:pairing:pairing-2", "student-3");
     roomDelivery.joinRoom(
       "frempower:activity:12345:teachers",
-      "teacher-socket-1",
+      "teacher-socket-1"
     );
     const typing: ChatTypingPayload = {
       activityId: "12345" as ActivityId,
@@ -579,7 +586,7 @@ describe("realtime room delivery", () => {
     expect(roomDelivery.getDeliveredEvents("teacher-socket-1")).toEqual([]);
   });
 
-  it("keeps audience-specific realtime event emits behind room delivery helpers", () => {
+  it("keeps audience-specific Realtime Server event emits behind room delivery helpers", () => {
     const roomDeliveryPath = join(sourceRoot, "realtime", "roomDelivery.ts");
     const audienceScopedEvents = [
       {
@@ -613,7 +620,7 @@ describe("realtime room delivery", () => {
               ({ constantName, eventName }) =>
                 line.includes(`REALTIME_EVENTS.${constantName}`) ||
                 line.includes(`"${eventName}"`) ||
-                line.includes(`'${eventName}'`),
+                line.includes(`'${eventName}'`)
             )
           ) {
             return [];

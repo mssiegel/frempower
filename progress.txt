@@ -7,13 +7,14 @@ Current mode:
 - Iteration diffs are left uncommitted for software engineering author review.
 
 Current local issue:
-- `local/issues/005-add-realtime-boundary-regression-tests.md` is in progress.
+- `local/issues/005-add-realtime-boundary-regression-tests.md` is complete.
 
 Completed local issues:
 - `local/issues/001-configure-realtime-heartbeat-baseline.md`
 - `local/issues/002-add-session-room-routing-foundation.md`
 - `local/issues/003-emit-realtime-updates-through-rooms.md`
 - `local/issues/004-recover-authoritative-state-after-reconnect.md`
+- `local/issues/005-add-realtime-boundary-regression-tests.md`
 
 Completed criteria:
 - `local/issues/001-configure-realtime-heartbeat-baseline.md`: The Realtime Server configures explicit Socket.IO `pingInterval` and `pingTimeout` values.
@@ -48,28 +49,35 @@ Completed criteria:
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover rejoining rooms after reconnect or resume.
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover room-scoped delivery isolation for teacher, student, and pairing audiences.
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover missed snapshot or chat recovery after reconnect.
+- `local/issues/005-add-realtime-boundary-regression-tests.md`: Test names use repo domain language such as **Realtime Server**, **Realtime Connection**, **Session ID**, **Classroom Activity**, and **Pairing**.
 
 Changed:
-- Added a student resume recovery boundary helper that validates a known Session ID, replaces an older Realtime Connection, rejoins the Session ID room, rejoins the active Pairing room when present, and sends the current student snapshot.
-- Added a regression test proving a missed Pairing chat message is recovered from authoritative student snapshot state when the student Realtime Connection resumes.
-- Marked the matching acceptance criterion complete in `local/issues/005-add-realtime-boundary-regression-tests.md`.
+- Renamed realtime boundary regression test descriptions to use repo domain language: **Realtime Server**, **Realtime Connection**, **Session ID**, **Classroom Activity**, and **Pairing**.
+- Marked the final acceptance criterion complete in `local/issues/005-add-realtime-boundary-regression-tests.md`.
+- Marked the matching PRD backlog item complete because all criteria in the local issue are now complete.
 
 Key decisions:
-- Selected the topmost unchecked criterion: tests cover missed snapshot or chat recovery after reconnect.
-- Kept the slice at the Realtime Server boundary and reused existing activity snapshot state rather than adding host, join, pairing, chat, settings, or End Activity product flows.
-- Did not add product host, join, pairing, chat, settings, or End Activity flows.
+- Selected the only unchecked criterion: test names use repo domain language.
+- Kept the slice to test description strings only; no production behavior changed.
 
 Blockers:
 - None.
 
 Files changed:
-- `server/src/realtime/resumeRecovery.ts`
+- `server/src/realtime/chatMessageDelivery.test.ts`
+- `server/src/realtime/connectionRegistry.test.ts`
+- `server/src/realtime/disconnectSignal.test.ts`
+- `server/src/realtime/heartbeat.test.ts`
 - `server/src/realtime/resumeRecovery.test.ts`
+- `server/src/realtime/roomDelivery.test.ts`
+- `server/src/realtime/roomNames.test.ts`
 - `local/issues/005-add-realtime-boundary-regression-tests.md`
+- `PRD.md`
 - `progress.txt`
 
 Verification:
+- Ran: `npx prettier --write` on changed TypeScript and Markdown files. Prettier formatted those files and reported no parser for `progress.txt`, which was left as plain text.
 - Passed: `npm run test -w server`
 
 Recommended next iteration:
-- Continue `local/issues/005-add-realtime-boundary-regression-tests.md` with the next unchecked criterion: Test names use repo domain language such as **Realtime Server**, **Realtime Connection**, **Session ID**, **Classroom Activity**, and **Pairing**.
+- No unchecked acceptance criteria remain in `local/issues/005-add-realtime-boundary-regression-tests.md`; the local Socket.IO implementation PRD backlog is complete.

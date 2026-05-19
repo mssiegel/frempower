@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { createRealtimeTransportDisconnectSignal } from "./disconnectSignal.js";
 
-describe("realtime disconnect signal instrumentation", () => {
-  it("treats Socket.IO disconnect as a transport-level signal for future domain disconnect behavior", () => {
+describe("Realtime Server disconnect signal instrumentation", () => {
+  it("treats Socket.IO disconnect as a transport-level signal for future Teacher Disconnect and Student Disconnect behavior", () => {
     const signal = createRealtimeTransportDisconnectSignal(
       "socket-1",
-      "ping timeout",
+      "ping timeout"
     );
 
     expect(signal).toMatchObject({

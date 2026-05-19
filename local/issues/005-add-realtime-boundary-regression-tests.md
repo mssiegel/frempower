@@ -17,7 +17,7 @@ This slice should focus on boundary behavior rather than exhaustive product flow
 - [x] Tests cover rejoining rooms after reconnect or resume.
 - [x] Tests cover room-scoped delivery isolation for teacher, student, and pairing audiences.
 - [x] Tests cover missed snapshot or chat recovery after reconnect.
-- [ ] Test names use repo domain language such as **Realtime Server**, **Realtime Connection**, **Session ID**, **Classroom Activity**, and **Pairing**.
+- [x] Test names use repo domain language such as **Realtime Server**, **Realtime Connection**, **Session ID**, **Classroom Activity**, and **Pairing**.
 
 ## Blocked by
 

@@ -112,7 +112,7 @@ const createSocket = (
   };
 };
 
-describe("realtime resume recovery", () => {
+describe("Realtime Connection resume recovery", () => {
   it("builds a teacher snapshot from authoritative Classroom Activity state", () => {
     const activity = createActivity({
       peerRealNameVisibility: true,
@@ -302,7 +302,7 @@ describe("realtime resume recovery", () => {
     ).toBeUndefined();
   });
 
-  it("sends a fresh teacher snapshot for the reconnecting Session ID when authoritative state exists", () => {
+  it("sends a fresh teacher Classroom Activity snapshot for the reconnecting Session ID when authoritative state exists", () => {
     const activity = createActivity();
     const registry = createRealtimeConnectionRegistry();
     const socket = createSocket();
@@ -415,7 +415,7 @@ describe("realtime resume recovery", () => {
     ]);
   });
 
-  it("recovers missed state changes by sending the current snapshot to the newest socket", () => {
+  it("recovers missed Classroom Activity state changes by sending the current snapshot to the newest Realtime Connection", () => {
     const activity = createActivity({
       lobbyStudents: [
         {
@@ -584,7 +584,7 @@ describe("realtime resume recovery", () => {
     ]);
   });
 
-  it("does not send a recovery snapshot when the activity is missing", () => {
+  it("does not send a recovery snapshot when the Classroom Activity is missing", () => {
     const registry = createRealtimeConnectionRegistry();
     const socket = createSocket();
     const delivery = createDeliveryServer();

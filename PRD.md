@@ -29,7 +29,7 @@ This PRD is intentionally scoped to the current codebase implementation. It is n
 - [x] `local/issues/002-add-session-room-routing-foundation.md`
 - [x] `local/issues/003-emit-realtime-updates-through-rooms.md`
 - [x] `local/issues/004-recover-authoritative-state-after-reconnect.md`
-- [ ] `local/issues/005-add-realtime-boundary-regression-tests.md`
+- [x] `local/issues/005-add-realtime-boundary-regression-tests.md`
 
 Current Ralph status: `local/issues/004-recover-authoritative-state-after-reconnect.md` is complete. Next iteration should start `local/issues/005-add-realtime-boundary-regression-tests.md`.
 

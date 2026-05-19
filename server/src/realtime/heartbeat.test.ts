@@ -6,7 +6,7 @@ import {
   realtimeHeartbeatDeadConnectionDetectionMs,
 } from "./heartbeat.js";
 
-describe("realtime heartbeat baseline", () => {
+describe("Realtime Server heartbeat baseline", () => {
   it("configures explicit Realtime Server heartbeat settings", () => {
     expect(realtimeHeartbeat).toEqual({
       pingInterval: 5000,
@@ -14,14 +14,14 @@ describe("realtime heartbeat baseline", () => {
     });
   });
 
-  it("keeps Socket.IO heartbeat timing shorter than domain reconnect grace periods", () => {
+  it("keeps Realtime Server heartbeat timing shorter than domain reconnect grace periods", () => {
     expect(isRealtimeHeartbeatShorterThanReconnectGracePeriods()).toBe(true);
 
     for (const gracePeriodMs of Object.values(domainReconnectGracePeriods)) {
       expect(realtimeHeartbeat.pingInterval).toBeLessThan(gracePeriodMs);
       expect(realtimeHeartbeat.pingTimeout).toBeLessThan(gracePeriodMs);
       expect(realtimeHeartbeatDeadConnectionDetectionMs).toBeLessThan(
-        gracePeriodMs,
+        gracePeriodMs
       );
     }
   });
