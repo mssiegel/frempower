@@ -5,7 +5,10 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import "./index.css";
-import { useRealtimeConnection } from "./realtime";
+import {
+  type RealtimeConnectionState,
+  useRealtimeConnection,
+} from "./realtime";
 
 function Homepage() {
   return (
@@ -203,7 +206,7 @@ function PagePlaceholder({
 }
 
 function RealtimeConnectionStatus() {
-  const { isConnected } = useRealtimeConnection();
+  const { isConnected, status } = useRealtimeConnection();
 
   return (
     <Typography
@@ -213,9 +216,21 @@ function RealtimeConnectionStatus() {
         fontWeight: 700,
       }}
     >
-      Realtime Connection: {isConnected ? "Connected" : "Connecting"}
+      Realtime Connection: {formatRealtimeConnectionStatus(status)}
     </Typography>
   );
+}
+
+function formatRealtimeConnectionStatus(status: RealtimeConnectionState) {
+  if (status === "connected") {
+    return "Connected";
+  }
+
+  if (status === "disconnected") {
+    return "Disconnected";
+  }
+
+  return "Connecting";
 }
 
 const router = createBrowserRouter([
