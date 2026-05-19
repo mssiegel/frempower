@@ -7,7 +7,7 @@ Current mode:
 - Iteration diffs are left uncommitted for software engineering author review.
 
 Current local issue:
-- `local/issues/004-recover-authoritative-state-after-reconnect.md` is complete.
+- `local/issues/005-add-realtime-boundary-regression-tests.md` is in progress.
 
 Completed local issues:
 - `local/issues/001-configure-realtime-heartbeat-baseline.md`
@@ -41,30 +41,27 @@ Completed criteria:
 - `local/issues/004-recover-authoritative-state-after-reconnect.md`: Typing indicators remain ephemeral and are allowed to expire during disconnects.
 - `local/issues/004-recover-authoritative-state-after-reconnect.md`: Tests cover reconnecting after a missed state change and receiving the current snapshot on the newest socket.
 - `local/issues/004-recover-authoritative-state-after-reconnect.md`: The Socket.IO layer does not make socket IDs participant identity.
+- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover explicit heartbeat configuration.
 
 Changed:
-- Added a room-scoped helper for ephemeral `chat:typing` delivery to active Pairing rooms.
-- Added tests proving typing indicators are emitted only to the active Pairing room and are not sent to unrelated pairing, teacher, or session rooms.
-- Marked the final `local/issues/004-recover-authoritative-state-after-reconnect.md` criterion complete.
-- Marked the matching `PRD.md` backlog item complete because all issue 004 criteria are now checked.
+- Added a heartbeat regression test that asserts the Realtime Server uses explicit Socket.IO `pingInterval` and `pingTimeout` values.
+- Marked the matching acceptance criterion complete in `local/issues/005-add-realtime-boundary-regression-tests.md`.
 
 Key decisions:
-- Selected the typing indicator criterion because it was the only remaining unchecked acceptance criterion and completed the reconnect recovery issue.
-- Kept typing indicators in the Socket.IO room-delivery boundary as transient realtime events.
-- Did not add activity-service persistence, pending delivery, or snapshot recovery for typing indicators; they may expire during Realtime Connection loss.
+- Selected the topmost unchecked criterion: tests cover explicit heartbeat configuration.
+- Kept the change at the test boundary because the production heartbeat settings were already implemented.
+- Used exact values in the regression test so future accidental defaulting or option drift is caught.
 
 Blockers:
 - None.
 
 Files changed:
-- `server/src/realtime/roomDelivery.ts`
-- `server/src/realtime/roomDelivery.test.ts`
-- `local/issues/004-recover-authoritative-state-after-reconnect.md`
-- `PRD.md`
+- `server/src/realtime/heartbeat.test.ts`
+- `local/issues/005-add-realtime-boundary-regression-tests.md`
 - `progress.txt`
 
 Verification:
 - Passed: `npm run test -w server`
 
 Recommended next iteration:
-- Start `local/issues/005-add-realtime-boundary-regression-tests.md`.
+- Continue `local/issues/005-add-realtime-boundary-regression-tests.md` with the next unchecked criterion: Tests cover one **Session ID** allowing only one live socket.
