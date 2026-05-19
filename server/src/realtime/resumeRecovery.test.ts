@@ -380,6 +380,91 @@ describe("realtime resume recovery", () => {
     ]);
   });
 
+  it("recovers missed state changes by sending the current snapshot to the newest socket", () => {
+    const activity = createActivity({
+      lobbyStudents: [
+        {
+          id: "student-1" as EntityId,
+          studentRealName: "Ada",
+          connectionStatus: "connected",
+        },
+      ],
+      activePairings: [
+        {
+          id: "pairing-1" as EntityId,
+          participants: [
+            {
+              studentId: "student-2" as EntityId,
+              studentRealName: "Grace",
+              characterName: "Guide",
+              connectionStatus: "connected",
+            },
+            {
+              studentId: "student-3" as EntityId,
+              studentRealName: "Linus",
+              characterName: "Builder",
+              connectionStatus: "connected",
+            },
+          ],
+          recentMessages: [
+            {
+              id: "message-1" as EntityId,
+              senderStudentId: "student-2" as EntityId,
+              senderCharacterName: "Guide",
+              text: "This happened while the teacher was reconnecting.",
+            },
+          ],
+        },
+      ],
+    });
+    const registry = createRealtimeConnectionRegistry();
+    const socket = createSocket("teacher-socket-2");
+    const delivery = createDeliveryServer();
+    const disconnectedSocketIds: string[] = [];
+
+    registry.registerSessionSocket(
+      activity.teacherSessionId,
+      "teacher-socket-1"
+    );
+
+    const result = sendTeacherResumeRecoverySnapshot({
+      activityService: {
+        getActivity: () => activity,
+      },
+      deliveryServer: delivery.server,
+      registry,
+      socketReplacement: {
+        disconnectSocket: (socketId) => {
+          disconnectedSocketIds.push(socketId);
+        },
+      },
+      socket,
+      sessionId: activity.teacherSessionId,
+      activityId: activity.activityId,
+    });
+
+    expect(result.ok).toBe(true);
+    expect(registry.getSocketIds(activity.teacherSessionId)).toEqual([
+      "teacher-socket-2",
+    ]);
+    expect(disconnectedSocketIds).toEqual(["teacher-socket-1"]);
+    expect(delivery.emitted).toEqual([
+      {
+        roomName: "frempower:activity:12345:teachers",
+        eventName: REALTIME_EVENTS.teacherActivitySnapshot,
+        payload: {
+          ...buildTeacherActivitySnapshot(activity),
+          counts: {
+            totalLiveStudents: 3,
+            lobbyStudents: 1,
+            studentsInChats: 2,
+            completedChats: 0,
+          },
+        },
+      },
+    ]);
+  });
+
   it("does not send a recovery snapshot when the activity is missing", () => {
     const registry = createRealtimeConnectionRegistry();
     const socket = createSocket();
