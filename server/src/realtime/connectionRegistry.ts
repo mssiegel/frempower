@@ -1,0 +1,33 @@
+import type { SessionId } from "@frempower/shared";
+
+export type TransportSocketId = string;
+
+export type RealtimeConnectionRegistry = {
+  registerSessionSocket(
+    sessionId: SessionId,
+    socketId: TransportSocketId,
+  ): void;
+  getSocketIds(sessionId: SessionId): readonly TransportSocketId[];
+  getSessionIds(): readonly SessionId[];
+};
+
+export const createRealtimeConnectionRegistry =
+  (): RealtimeConnectionRegistry => {
+    const socketsBySessionId = new Map<SessionId, Set<TransportSocketId>>();
+
+    return {
+      registerSessionSocket(sessionId, socketId) {
+        const socketIds = socketsBySessionId.get(sessionId) ?? new Set();
+        socketIds.add(socketId);
+        socketsBySessionId.set(sessionId, socketIds);
+      },
+
+      getSocketIds(sessionId) {
+        return [...(socketsBySessionId.get(sessionId) ?? [])];
+      },
+
+      getSessionIds() {
+        return [...socketsBySessionId.keys()];
+      },
+    };
+  };
