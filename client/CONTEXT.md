@@ -168,6 +168,15 @@ _Avoid_: WebSocket, polling stream
 - The host flow labels the editable **Character List** section as **Characters**.
 - Input labels, validation, and precise references use **Character Name**.
 - The teacher can add and remove **Character Name** fields while editing the **Character List**.
+- Each editable **Character Name** row on `/teacher` has a text input and a small remove icon button with accessible labeling.
+- The `/teacher` host flow presents setup as a short sequence: create the **Characters**, choose quiet optional settings, then use **Host activity**.
+- The `/teacher` setup sequence may use numbered steps for visual rhythm, but it is not a wizard; the teacher can edit any setup field at any time.
+- In version 1, **Host activity** stays in the normal `/teacher` page flow after the setup sections rather than using a sticky action bar.
+- The `/teacher` host flow keeps readiness status local to the **Characters** validation message and **Host activity** blocker or ready copy; it does not show a separate top status summary.
+- When the `/teacher` host flow becomes valid, it shows a calm ready state by enabling **Host activity** and updating local ready copy; it does not show a success banner or celebratory state.
+- Hosting a **Classroom Activity** requires the teacher to update the default **Character List**.
+- In the `/teacher` host flow, the default **Character List** is considered updated when at least one of `Character 1`, `Character 2`, or `Character 3` has changed.
+- Removing one of the default **Character Name** rows counts as updating the default **Character List**.
 - Hosting a **Classroom Activity** requires at least two distinct non-empty **Character Names**.
 - The teacher can edit the **Character List** while the **Classroom Activity** is live.
 - Edits to the **Character List** affect only future **Pairings**.
@@ -179,6 +188,7 @@ _Avoid_: WebSocket, polling stream
 - Applied **Character Names** preserve the teacher's chosen casing for display.
 - The **Teacher Page** does not ask for a teacher name in version 1.
 - The **Teacher Page** can host an activity with or without a **Teacher Email**.
+- The `/teacher` host flow shows **Teacher Email** before hosting as a visible but quiet optional field for transcript delivery.
 - The teacher can enter or update **Teacher Email** while the **Classroom Activity** is live.
 - The **Student Page** requires a **Student Real Name** so the teacher can identify each student.
 - The student-facing label for **Student Real Name** is "Your name".
@@ -225,6 +235,7 @@ _Avoid_: WebSocket, polling stream
 - Typing events are sent only when the chat input has non-whitespace text.
 - Clearing the chat input clears the student's typing indicator for their partner.
 - **Peer Real Name Visibility** starts off when hosting a **Classroom Activity**.
+- The `/teacher` host flow shows **Peer Real Name Visibility** before hosting as a plain toggle labeled in teacher-facing action language such as "Show students their partner's real name".
 - The teacher can change **Peer Real Name Visibility** while the **Classroom Activity** is live.
 - The **Student Page** responds to **Peer Real Name Visibility** changes over the **Realtime Connection**.
 - The **Teacher Page** shows the **Student List** and lets a teacher manually pair exactly two students.
