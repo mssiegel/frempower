@@ -25,6 +25,10 @@ export type RealtimeResumeSocket = {
   join(roomName: string): void;
 };
 
+export type RealtimeResumeSocketReplacement = {
+  disconnectSocket(socketId: string): void;
+};
+
 export type TeacherResumeRecoverySuccess = {
   activityId: ActivityId;
   sessionId: SessionId;
@@ -34,6 +38,7 @@ export type SendTeacherResumeRecoverySnapshotOptions = {
   activityService: Pick<ActivityService, "getActivity">;
   deliveryServer: RealtimeRoomDeliveryServer;
   registry: RealtimeConnectionRegistry;
+  socketReplacement: RealtimeResumeSocketReplacement;
   socket: RealtimeResumeSocket;
   sessionId: SessionId;
   activityId: ActivityId;
@@ -62,6 +67,7 @@ export const sendTeacherResumeRecoverySnapshot = ({
   activityService,
   deliveryServer,
   registry,
+  socketReplacement,
   socket,
   sessionId,
   activityId,
@@ -82,7 +88,11 @@ export const sendTeacherResumeRecoverySnapshot = ({
     });
   }
 
-  registry.registerSessionSocket(sessionId, socket.id);
+  const registration = registry.registerSessionSocket(sessionId, socket.id);
+  if (registration.replacedSocketId !== undefined) {
+    socketReplacement.disconnectSocket(registration.replacedSocketId);
+  }
+
   socket.join(getSessionRoomName(sessionId));
   socket.join(getTeacherActivityRoomName(activityId));
   emitTeacherActivitySnapshotToRoom(

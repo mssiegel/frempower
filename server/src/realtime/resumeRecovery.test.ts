@@ -64,11 +64,13 @@ const createDeliveryServer = () => {
   return { emitted, server };
 };
 
-const createSocket = (): RealtimeResumeSocket & { joinedRooms: string[] } => {
+const createSocket = (
+  id = "teacher-socket-1"
+): RealtimeResumeSocket & { joinedRooms: string[] } => {
   const joinedRooms: string[] = [];
 
   return {
-    id: "teacher-socket-1",
+    id,
     joinedRooms,
     join(roomName) {
       joinedRooms.push(roomName);
@@ -106,6 +108,7 @@ describe("realtime resume recovery", () => {
     const registry = createRealtimeConnectionRegistry();
     const socket = createSocket();
     const delivery = createDeliveryServer();
+    const disconnectedSocketIds: string[] = [];
 
     const result = sendTeacherResumeRecoverySnapshot({
       activityService: {
@@ -113,6 +116,11 @@ describe("realtime resume recovery", () => {
       },
       deliveryServer: delivery.server,
       registry,
+      socketReplacement: {
+        disconnectSocket: (socketId) => {
+          disconnectedSocketIds.push(socketId);
+        },
+      },
       socket,
       sessionId: activity.teacherSessionId,
       activityId: activity.activityId,
@@ -139,12 +147,76 @@ describe("realtime resume recovery", () => {
         payload: buildTeacherActivitySnapshot(activity),
       },
     ]);
+    expect(disconnectedSocketIds).toEqual([]);
+  });
+
+  it("treats the newest socket for a Session ID as current and disconnects the older socket before sending the recovery snapshot", () => {
+    const activity = createActivity();
+    const registry = createRealtimeConnectionRegistry();
+    const socket = createSocket("teacher-socket-2");
+    const delivery = createDeliveryServer();
+    const operations: string[] = [];
+
+    registry.registerSessionSocket(
+      activity.teacherSessionId,
+      "teacher-socket-1"
+    );
+
+    const result = sendTeacherResumeRecoverySnapshot({
+      activityService: {
+        getActivity: () => activity,
+      },
+      deliveryServer: {
+        to(roomName) {
+          const target: RealtimeRoomDeliveryTarget = {
+            emit(eventName, payload) {
+              if (eventName !== REALTIME_EVENTS.teacherActivitySnapshot) {
+                throw new Error(`Unexpected event: ${eventName}`);
+              }
+
+              delivery.server
+                .to(roomName)
+                .emit(eventName, payload as TeacherActivitySnapshot);
+              operations.push(`emit:${eventName}`);
+            },
+          };
+
+          return target;
+        },
+      },
+      registry,
+      socketReplacement: {
+        disconnectSocket: (socketId) => {
+          operations.push(`disconnect:${socketId}`);
+        },
+      },
+      socket,
+      sessionId: activity.teacherSessionId,
+      activityId: activity.activityId,
+    });
+
+    expect(result.ok).toBe(true);
+    expect(registry.getSocketIds(activity.teacherSessionId)).toEqual([
+      "teacher-socket-2",
+    ]);
+    expect(operations).toEqual([
+      "disconnect:teacher-socket-1",
+      `emit:${REALTIME_EVENTS.teacherActivitySnapshot}`,
+    ]);
+    expect(delivery.emitted).toEqual([
+      {
+        roomName: "frempower:activity:12345:teachers",
+        eventName: REALTIME_EVENTS.teacherActivitySnapshot,
+        payload: buildTeacherActivitySnapshot(activity),
+      },
+    ]);
   });
 
   it("does not send a recovery snapshot when the activity is missing", () => {
     const registry = createRealtimeConnectionRegistry();
     const socket = createSocket();
     const delivery = createDeliveryServer();
+    const disconnectedSocketIds: string[] = [];
 
     const result = sendTeacherResumeRecoverySnapshot({
       activityService: {
@@ -152,6 +224,11 @@ describe("realtime resume recovery", () => {
       },
       deliveryServer: delivery.server,
       registry,
+      socketReplacement: {
+        disconnectSocket: (socketId) => {
+          disconnectedSocketIds.push(socketId);
+        },
+      },
       socket,
       sessionId: "teacher-session-1" as SessionId,
       activityId: "12345" as ActivityId,
@@ -167,6 +244,7 @@ describe("realtime resume recovery", () => {
     expect(registry.getSessionIds()).toEqual([]);
     expect(socket.joinedRooms).toEqual([]);
     expect(delivery.emitted).toEqual([]);
+    expect(disconnectedSocketIds).toEqual([]);
   });
 
   it("does not send a recovery snapshot for a non-teacher Session ID", () => {
@@ -174,6 +252,7 @@ describe("realtime resume recovery", () => {
     const registry = createRealtimeConnectionRegistry();
     const socket = createSocket();
     const delivery = createDeliveryServer();
+    const disconnectedSocketIds: string[] = [];
 
     const result = sendTeacherResumeRecoverySnapshot({
       activityService: {
@@ -181,6 +260,11 @@ describe("realtime resume recovery", () => {
       },
       deliveryServer: delivery.server,
       registry,
+      socketReplacement: {
+        disconnectSocket: (socketId) => {
+          disconnectedSocketIds.push(socketId);
+        },
+      },
       socket,
       sessionId: "other-session" as SessionId,
       activityId: activity.activityId,
@@ -196,5 +280,6 @@ describe("realtime resume recovery", () => {
     expect(registry.getSessionIds()).toEqual([]);
     expect(socket.joinedRooms).toEqual([]);
     expect(delivery.emitted).toEqual([]);
+    expect(disconnectedSocketIds).toEqual([]);
   });
 });
