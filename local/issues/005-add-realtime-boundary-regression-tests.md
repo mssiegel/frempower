@@ -15,7 +15,7 @@ This slice should focus on boundary behavior rather than exhaustive product flow
 - [x] Tests cover a newer socket replacing an older socket for the same **Session ID**.
 - [x] Tests cover current-socket disconnect behavior.
 - [x] Tests cover rejoining rooms after reconnect or resume.
-- [ ] Tests cover room-scoped delivery isolation for teacher, student, and pairing audiences.
+- [x] Tests cover room-scoped delivery isolation for teacher, student, and pairing audiences.
 - [ ] Tests cover missed snapshot or chat recovery after reconnect.
 - [ ] Test names use repo domain language such as **Realtime Server**, **Realtime Connection**, **Session ID**, **Classroom Activity**, and **Pairing**.
 

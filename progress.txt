@@ -46,27 +46,29 @@ Completed criteria:
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover a newer socket replacing an older socket for the same **Session ID**.
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover current-socket disconnect behavior.
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover rejoining rooms after reconnect or resume.
+- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover room-scoped delivery isolation for teacher, student, and pairing audiences.
 
 Changed:
-- Renamed the teacher resume recovery regression test to state the room-rejoin boundary contract directly.
-- Added an assertion that a newer teacher **Realtime Connection** resuming the same **Session ID** rejoins both the Session ID room and the teacher **Classroom Activity** room after replacing the older socket.
+- Added a Realtime Server boundary regression test that emits teacher snapshots, student snapshots, and Pairing chat messages through room delivery helpers in one scenario.
+- The test asserts each intended audience receives only its room-scoped event and unrelated teacher, student Session ID, and Pairing sockets receive nothing.
 - Marked the matching acceptance criterion complete in `local/issues/005-add-realtime-boundary-regression-tests.md`.
 
 Key decisions:
-- Selected the topmost unchecked criterion: tests cover rejoining rooms after reconnect or resume.
-- Kept the change at the server boundary test layer because the production resume path already joins the required rooms.
-- Covered the reconnect/resume case through teacher resume recovery, which is the current route-specific resume implementation in the Realtime Server boundary code.
+- Selected the topmost unchecked criterion: tests cover room-scoped delivery isolation for teacher, student, and pairing audiences.
+- Kept the change at the server boundary test layer because production room delivery helpers already define the teacher, student Session ID, and Pairing audience contract.
+- Did not add product host, join, pairing, chat, settings, or End Activity flows.
 
 Blockers:
 - None.
 
 Files changed:
-- `server/src/realtime/resumeRecovery.test.ts`
+- `server/src/realtime/roomDelivery.test.ts`
 - `local/issues/005-add-realtime-boundary-regression-tests.md`
 - `progress.txt`
 
 Verification:
 - Passed: `npm run test -w server`
+- Note: an attempted focused command, `npm run test -w server -- --run server/src/realtime/roomDelivery.test.ts`, ran Vitest successfully but failed because the extra arguments were also forwarded to `tsc`.
 
 Recommended next iteration:
-- Continue `local/issues/005-add-realtime-boundary-regression-tests.md` with the next unchecked criterion: Tests cover room-scoped delivery isolation for teacher, student, and pairing audiences.
+- Continue `local/issues/005-add-realtime-boundary-regression-tests.md` with the next unchecked criterion: Tests cover missed snapshot or chat recovery after reconnect.

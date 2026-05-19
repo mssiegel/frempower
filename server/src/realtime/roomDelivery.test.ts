@@ -439,6 +439,112 @@ describe("realtime room delivery", () => {
     expect(roomDelivery.getDeliveredEvents("teacher-socket-1")).toEqual([]);
   });
 
+  it("keeps Realtime Server room-scoped delivery isolated across teacher, student, and Pairing audiences", () => {
+    const activityId = "12345" as ActivityId;
+    const studentSessionId = "student-session-1" as SessionId;
+    const pairingId = "pairing-1" as EntityId;
+    const registry = createRealtimeConnectionRegistry();
+    const roomDelivery = createRoomScopedDeliveryServer();
+    registry.registerSessionSocket(studentSessionId, "student-session-socket");
+    roomDelivery.joinRoom(
+      "frempower:activity:12345:teachers",
+      "teacher-socket-1",
+    );
+    roomDelivery.joinRoom(
+      "frempower:activity:67890:teachers",
+      "other-teacher-socket",
+    );
+    roomDelivery.joinRoom(
+      "frempower:session:student-session-1",
+      "student-session-socket",
+    );
+    roomDelivery.joinRoom(
+      "frempower:session:student-session-2",
+      "other-student-session-socket",
+    );
+    roomDelivery.joinRoom("frempower:pairing:pairing-1", "pairing-student-1");
+    roomDelivery.joinRoom("frempower:pairing:pairing-1", "pairing-student-2");
+    roomDelivery.joinRoom(
+      "frempower:pairing:pairing-2",
+      "other-pairing-student",
+    );
+    const teacherSnapshot: TeacherActivitySnapshot = {
+      activityId,
+      joinCode: "12345",
+      characterNames: ["Character 1", "Character 2"],
+      peerRealNameVisibility: false,
+      lobbyStudents: [],
+      activePairings: [],
+      completedChats: [],
+      counts: {
+        totalLiveStudents: 0,
+        lobbyStudents: 0,
+        studentsInChats: 0,
+        completedChats: 0,
+      },
+    };
+    const studentSnapshot: StudentActivitySnapshot = {
+      activityId,
+      joinCode: "12345",
+      studentId: "student-1",
+      studentRealName: "Ada",
+      state: "lobby",
+    };
+    const message: ChatMessageSnapshot = {
+      id: "message-1",
+      senderStudentId: "student-1",
+      senderCharacterName: "Character 1",
+      text: "Hello there",
+    };
+
+    emitTeacherActivitySnapshotToRoom(
+      roomDelivery.server,
+      activityId,
+      teacherSnapshot,
+    );
+    expect(
+      emitStudentActivitySnapshotToSessionRoom(
+        roomDelivery.server,
+        registry,
+        studentSessionId,
+        studentSnapshot,
+      ),
+    ).toBe(true);
+    emitChatMessageToPairingRoom(roomDelivery.server, pairingId, message);
+
+    expect(roomDelivery.getDeliveredEvents("teacher-socket-1")).toEqual([
+      {
+        eventName: REALTIME_EVENTS.teacherActivitySnapshot,
+        payload: teacherSnapshot,
+      },
+    ]);
+    expect(roomDelivery.getDeliveredEvents("student-session-socket")).toEqual([
+      {
+        eventName: REALTIME_EVENTS.studentActivitySnapshot,
+        payload: studentSnapshot,
+      },
+    ]);
+    expect(roomDelivery.getDeliveredEvents("pairing-student-1")).toEqual([
+      {
+        eventName: REALTIME_EVENTS.chatSendMessage,
+        payload: message,
+      },
+    ]);
+    expect(roomDelivery.getDeliveredEvents("pairing-student-2")).toEqual([
+      {
+        eventName: REALTIME_EVENTS.chatSendMessage,
+        payload: message,
+      },
+    ]);
+    expect(roomDelivery.getDeliveredEvents("other-teacher-socket")).toEqual([]);
+    expect(
+      roomDelivery.getDeliveredEvents("other-student-session-socket"),
+    ).toEqual([]);
+    expect(roomDelivery.getDeliveredEvents("other-pairing-student")).toEqual(
+      [],
+    );
+  });
+
   it("does not deliver ephemeral typing indicators to sockets outside the active Pairing room", () => {
     const pairingId = "pairing-1" as EntityId;
     const roomDelivery = createRoomScopedDeliveryServer();
