@@ -19,5 +19,11 @@ describe("realtime room names", () => {
       "frempower:activity:12345:teachers",
     );
     expect(getPairingRoomName(pairingId)).toBe("frempower:pairing:pairing-1");
+
+    expect(getSessionRoomName(sessionId)).toBe(getSessionRoomName(sessionId));
+    expect(getTeacherActivityRoomName(activityId)).toBe(
+      getTeacherActivityRoomName(activityId),
+    );
+    expect(getPairingRoomName(pairingId)).toBe(getPairingRoomName(pairingId));
   });
 });

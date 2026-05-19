@@ -62,6 +62,28 @@ describe("realtime connection registry", () => {
     expect(registry.unregisterSocket("teacher-socket-1")).toBeUndefined();
   });
 
+  it("keeps the replacement socket current until that socket disconnects", () => {
+    const registry = createRealtimeConnectionRegistry();
+    const teacherSessionId = "teacher-session-1" as SessionId;
+
+    registry.registerSessionSocket(teacherSessionId, "teacher-socket-1");
+    registry.registerSessionSocket(teacherSessionId, "teacher-socket-2");
+
+    expect(registry.unregisterSocket("teacher-socket-1")).toBeUndefined();
+    expect(registry.isSessionConnected(teacherSessionId)).toBe(true);
+    expect(registry.getSocketIds(teacherSessionId)).toEqual([
+      "teacher-socket-2",
+    ]);
+
+    expect(registry.unregisterSocket("teacher-socket-2")).toEqual({
+      sessionId: teacherSessionId,
+      socketId: "teacher-socket-2",
+      remainingSocketCount: 0,
+      isLastSocketForSession: true,
+    });
+    expect(registry.isSessionConnected(teacherSessionId)).toBe(false);
+  });
+
   it("considers a Session ID connected while its current transport socket remains registered", () => {
     const registry = createRealtimeConnectionRegistry();
     const teacherSessionId = "teacher-session-1" as SessionId;
