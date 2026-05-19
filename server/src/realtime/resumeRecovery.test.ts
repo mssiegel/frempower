@@ -318,7 +318,7 @@ describe("realtime resume recovery", () => {
     expect(disconnectedSocketIds).toEqual([]);
   });
 
-  it("treats the newest socket for a Session ID as current and disconnects the older socket before sending the recovery snapshot", () => {
+  it("rejoins rooms when a newer Realtime Connection resumes the same Session ID", () => {
     const activity = createActivity();
     const registry = createRealtimeConnectionRegistry();
     const socket = createSocket("teacher-socket-2");
@@ -366,6 +366,10 @@ describe("realtime resume recovery", () => {
     expect(result.ok).toBe(true);
     expect(registry.getSocketIds(activity.teacherSessionId)).toEqual([
       "teacher-socket-2",
+    ]);
+    expect(socket.joinedRooms).toEqual([
+      "frempower:session:teacher-session-1",
+      "frempower:activity:12345:teachers",
     ]);
     expect(operations).toEqual([
       "disconnect:teacher-socket-1",

@@ -45,21 +45,23 @@ Completed criteria:
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover one **Session ID** allowing only one live socket.
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover a newer socket replacing an older socket for the same **Session ID**.
 - `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover current-socket disconnect behavior.
+- `local/issues/005-add-realtime-boundary-regression-tests.md`: Tests cover rejoining rooms after reconnect or resume.
 
 Changed:
-- Renamed the connection registry disconnect regression tests to state the V1 boundary contract in repo domain language: an older socket disconnect does not remove the newer **Realtime Connection**, and the current **Realtime Connection** disconnect reports the **Session ID** as disconnected.
+- Renamed the teacher resume recovery regression test to state the room-rejoin boundary contract directly.
+- Added an assertion that a newer teacher **Realtime Connection** resuming the same **Session ID** rejoins both the Session ID room and the teacher **Classroom Activity** room after replacing the older socket.
 - Marked the matching acceptance criterion complete in `local/issues/005-add-realtime-boundary-regression-tests.md`.
 
 Key decisions:
-- Selected the topmost unchecked criterion: tests cover current-socket disconnect behavior.
-- Kept the change at the test boundary because the production registry behavior was already implemented and covered.
-- Preserved the existing assertions that stale socket disconnects are ignored, the newer socket remains current, and disconnecting the current socket removes the **Session ID** from the registry.
+- Selected the topmost unchecked criterion: tests cover rejoining rooms after reconnect or resume.
+- Kept the change at the server boundary test layer because the production resume path already joins the required rooms.
+- Covered the reconnect/resume case through teacher resume recovery, which is the current route-specific resume implementation in the Realtime Server boundary code.
 
 Blockers:
 - None.
 
 Files changed:
-- `server/src/realtime/connectionRegistry.test.ts`
+- `server/src/realtime/resumeRecovery.test.ts`
 - `local/issues/005-add-realtime-boundary-regression-tests.md`
 - `progress.txt`
 
@@ -67,4 +69,4 @@ Verification:
 - Passed: `npm run test -w server`
 
 Recommended next iteration:
-- Continue `local/issues/005-add-realtime-boundary-regression-tests.md` with the next unchecked criterion: Tests cover rejoining rooms after reconnect or resume.
+- Continue `local/issues/005-add-realtime-boundary-regression-tests.md` with the next unchecked criterion: Tests cover room-scoped delivery isolation for teacher, student, and pairing audiences.
