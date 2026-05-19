@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import type {
   ActivityId,
   ChatMessageSnapshot,
+  ChatTypingPayload,
   EntityId,
   SessionId,
   StudentActivitySnapshot,
@@ -14,6 +15,7 @@ import { describe, expect, it } from "vitest";
 import { createRealtimeConnectionRegistry } from "./connectionRegistry.js";
 import {
   emitChatMessageToPairingRoom,
+  emitChatTypingToPairingRoom,
   emitStudentActivitySnapshotToSessionRoom,
   emitTeacherActivitySnapshotToRoom,
   type RealtimeRoomDeliveryServer,
@@ -23,12 +25,14 @@ import {
 type RoomDeliveryEvent =
   | typeof REALTIME_EVENTS.teacherActivitySnapshot
   | typeof REALTIME_EVENTS.studentActivitySnapshot
-  | typeof REALTIME_EVENTS.chatSendMessage;
+  | typeof REALTIME_EVENTS.chatSendMessage
+  | typeof REALTIME_EVENTS.chatTyping;
 
 type RoomDeliveryPayload =
   | TeacherActivitySnapshot
   | StudentActivitySnapshot
-  | ChatMessageSnapshot;
+  | ChatMessageSnapshot
+  | ChatTypingPayload;
 
 type DeliveredEvent = {
   eventName: RoomDeliveryEvent;
@@ -279,6 +283,45 @@ describe("realtime room delivery", () => {
     ]);
   });
 
+  it("emits ephemeral typing indicators to the active Pairing room", () => {
+    const pairingId = "pairing-1" as EntityId;
+    const emitted: Array<{
+      eventName: typeof REALTIME_EVENTS.chatTyping;
+      payload: ChatTypingPayload;
+    }> = [];
+    const roomNames: string[] = [];
+    const target: RealtimeRoomDeliveryTarget = {
+      emit(eventName, payload) {
+        if (eventName !== REALTIME_EVENTS.chatTyping) {
+          throw new Error(`Unexpected event: ${eventName}`);
+        }
+        emitted.push({ eventName, payload: payload as ChatTypingPayload });
+      },
+    };
+    const server: RealtimeRoomDeliveryServer = {
+      to(roomName) {
+        roomNames.push(roomName);
+
+        return target;
+      },
+    };
+    const typing: ChatTypingPayload = {
+      activityId: "12345" as ActivityId,
+      pairingId,
+      isTyping: true,
+    };
+
+    emitChatTypingToPairingRoom(server, pairingId, typing);
+
+    expect(roomNames).toEqual(["frempower:pairing:pairing-1"]);
+    expect(emitted).toEqual([
+      {
+        eventName: REALTIME_EVENTS.chatTyping,
+        payload: typing,
+      },
+    ]);
+  });
+
   it("does not deliver teacher activity snapshots to sockets outside the teacher activity room", () => {
     const activityId = "12345" as ActivityId;
     const roomDelivery = createRoomScopedDeliveryServer();
@@ -390,6 +433,40 @@ describe("realtime room delivery", () => {
       {
         eventName: REALTIME_EVENTS.chatSendMessage,
         payload: message,
+      },
+    ]);
+    expect(roomDelivery.getDeliveredEvents("student-3")).toEqual([]);
+    expect(roomDelivery.getDeliveredEvents("teacher-socket-1")).toEqual([]);
+  });
+
+  it("does not deliver ephemeral typing indicators to sockets outside the active Pairing room", () => {
+    const pairingId = "pairing-1" as EntityId;
+    const roomDelivery = createRoomScopedDeliveryServer();
+    roomDelivery.joinRoom("frempower:pairing:pairing-1", "student-1");
+    roomDelivery.joinRoom("frempower:pairing:pairing-1", "student-2");
+    roomDelivery.joinRoom("frempower:pairing:pairing-2", "student-3");
+    roomDelivery.joinRoom(
+      "frempower:activity:12345:teachers",
+      "teacher-socket-1",
+    );
+    const typing: ChatTypingPayload = {
+      activityId: "12345" as ActivityId,
+      pairingId,
+      isTyping: true,
+    };
+
+    emitChatTypingToPairingRoom(roomDelivery.server, pairingId, typing);
+
+    expect(roomDelivery.getDeliveredEvents("student-1")).toEqual([
+      {
+        eventName: REALTIME_EVENTS.chatTyping,
+        payload: typing,
+      },
+    ]);
+    expect(roomDelivery.getDeliveredEvents("student-2")).toEqual([
+      {
+        eventName: REALTIME_EVENTS.chatTyping,
+        payload: typing,
       },
     ]);
     expect(roomDelivery.getDeliveredEvents("student-3")).toEqual([]);

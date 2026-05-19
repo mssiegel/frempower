@@ -1,6 +1,7 @@
 import type {
   ActivityId,
   ChatMessageSnapshot,
+  ChatTypingPayload,
   EntityId,
   SessionId,
   StudentActivitySnapshot,
@@ -26,6 +27,10 @@ export type RealtimeRoomDeliveryTarget = {
   emit(
     eventName: typeof REALTIME_EVENTS.chatSendMessage,
     payload: ChatMessageSnapshot,
+  ): void;
+  emit(
+    eventName: typeof REALTIME_EVENTS.chatTyping,
+    payload: ChatTypingPayload,
   ): void;
 };
 
@@ -74,4 +79,14 @@ export const emitChatMessageToPairingRoom = (
   server
     .to(getPairingRoomName(pairingId))
     .emit(REALTIME_EVENTS.chatSendMessage, message);
+};
+
+export const emitChatTypingToPairingRoom = (
+  server: RealtimeRoomDeliveryServer,
+  pairingId: EntityId,
+  typing: ChatTypingPayload,
+): void => {
+  server
+    .to(getPairingRoomName(pairingId))
+    .emit(REALTIME_EVENTS.chatTyping, typing);
 };
