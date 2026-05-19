@@ -22,9 +22,11 @@ Bring the current Realtime Server and Client in line with the V1 realtime contra
    - Treat Socket.IO `disconnect` as the transport signal that may start a domain reconnect timer after the last socket for a **Session ID** disconnects.
 
 2. Add a Realtime Connection registry in the Socket.IO layer.
-   - Track `Session ID -> Set<socket.id>`.
+   - Track `Session ID -> current socket.id`.
    - Join sockets to a stable Session ID room after successful host, join, or resume.
-   - Mark a participant disconnected only when the Session ID socket set becomes empty.
+   - Enforce one live socket per **Session ID**.
+   - If a new socket resumes the same **Session ID**, disconnect the previous socket and treat the new socket as current.
+   - Mark a participant disconnected when the current socket disconnects without being replaced.
    - Rejoin rooms and cancel pending disconnect timers on resume.
 
 3. Define room naming helpers in the server Socket.IO layer.
@@ -52,6 +54,6 @@ Bring the current Realtime Server and Client in line with the V1 realtime contra
 
 7. Test the boundary behavior.
    - Unit-test room naming and connection registry behavior.
-   - Socket.IO integration-test last-socket disconnect, multi-tab Session IDs, resume room rejoin, and heartbeat-driven disconnect handling.
+   - Socket.IO integration-test single-live-socket replacement, current-socket disconnect, resume room rejoin, and heartbeat-driven disconnect handling.
    - Activity-service tests should use fake timers or injectable timers for reconnect timeouts.
    - Chat tests should prove pairing isolation and missed-message recovery after reconnect.
