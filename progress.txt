@@ -3,7 +3,7 @@ Teacher host form setup flow progress
 Current mode:
 - AFK Ralph targets the local issue for the `/teacher` host form setup flow.
 - Each Ralph iteration implements exactly one unchecked acceptance criterion from the selected local issue.
-- `afk-ralph.sh` commits each successful iteration on `main`.
+- `afk-ralph.sh` commits each successful iteration on the current named branch.
 - Ralph must still update the local issue, `PRD.md`, and this file before it stops.
 
 Current local issue:

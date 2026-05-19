@@ -53,7 +53,7 @@ Current Ralph status: start `local/issues/issue-4-001-build-teacher-host-form-se
 4. Ralph marks that criterion complete in the local issue only after relevant verification passes, or records the blocker in `progress.txt`.
 5. When the local issue has no remaining unchecked acceptance criteria, Ralph marks the matching backlog item complete in this PRD.
 6. Ralph updates `progress.txt` every iteration.
-7. Ralph commits each successful iteration on `main`; do not push, merge, close GitHub issues, or modify GitHub issues.
+7. Ralph commits each successful iteration on the current named branch; do not push, merge, close GitHub issues, or modify GitHub issues.
 
 ## Verification
 

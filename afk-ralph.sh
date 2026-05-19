@@ -52,11 +52,12 @@ if [[ "$MAX_ITERATIONS" -eq 0 ]]; then
 fi
 
 CURRENT_BRANCH="$(git branch --show-current)"
-if [[ "$CURRENT_BRANCH" != "main" ]]; then
-  echo "AFK Ralph commits directly to main, but the current branch is '$CURRENT_BRANCH'." >&2
-  echo "Switch to main before running this script." >&2
+if [[ -z "$CURRENT_BRANCH" ]]; then
+  echo "AFK Ralph requires a named branch, but Git is currently detached." >&2
+  echo "Switch to a branch before running this script." >&2
   exit 1
 fi
+echo "AFK Ralph will commit successful iterations to the current branch: $CURRENT_BRANCH"
 
 ensure_clean_worktree
 
@@ -169,7 +170,7 @@ PROMPT
 
   git commit -m "Complete Ralph criterion: $criterion"
 
-  echo "Committed iteration $i on main."
+  echo "Committed iteration $i on $CURRENT_BRANCH."
 done
 
 remaining="$(count_unchecked_criteria)"
